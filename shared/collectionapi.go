@@ -47,3 +47,11 @@ func (req *CollectionDeleteRequest) Validate() error {
 
 	return nil
 }
+
+//
+// Responses
+//
+
+type CollectionPutResponse struct {
+	ID string `json:"id"`
+}

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"bytes"
-	"encoding/json"
 	"klutzer/conanical-library-app/shared"
 	"net/http"
 	"time"
@@ -14,7 +12,8 @@ func NewCmdCreate() Cmd {
 	return &cmdCreate{}
 }
 
-type cmdCreate struct{}
+type cmdCreate struct {
+}
 
 func (c *cmdCreate) Command() *cobra.Command {
 	cmd := &cobra.Command{}
@@ -30,9 +29,15 @@ func (c *cmdCreate) Run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func NewCmdCreateBook(httpClient *http.Client) Cmd {
+//
+// Create Book
+//
+
+func NewCmdCreateBook(httpClient *http.Client, host *string, protocol *string) Cmd {
 	return &cmdCreateBook{
 		httpClient: httpClient,
+		host:       host,
+		protocol:   protocol,
 	}
 }
 
@@ -45,7 +50,7 @@ type cmdCreateBook struct {
 	genre       *string
 	edition     *uint8
 
-	hostname *string
+	host     *string
 	protocol *string
 }
 
@@ -61,25 +66,22 @@ func (c *cmdCreateBook) Command() *cobra.Command {
 	c.author = cmd.Flags().String("author", "", "The author of the book")
 	c.description = cmd.Flags().String("description", "", "A brief description of the book")
 	c.publishedAt = cmd.Flags().String("published", "1970-01-01", "The data the book was published")
-	c.genre = cmd.Flags().String("genre", "", "A brief description of the book")
+	c.genre = cmd.Flags().String("genre", "", "The genre of the book, valid genres are: "+shared.ValidGenreStr+"")
 	c.edition = cmd.Flags().Uint8("edition", 1, "The edition of the book")
 
 	// Book specified
 	cmd.Args = cobra.ExactArgs(1)
 
-	// Request specific args
-	c.hostname = cmd.Flags().String("host", "localhost:8080", "The host the server is on, including the port")
-	c.protocol = cmd.Flags().String("protocol", "http", "The protocol to use when making the request")
-
 	return cmd
 }
 
 func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
-	url := *c.protocol + "://" + *c.hostname + "/v1/book"
+	url := *c.protocol + "://" + *c.host + "/v1/book"
 
 	tt, err := time.Parse(time.DateOnly, *c.publishedAt)
 	if err != nil {
 		cmd.Println("The published date provided is not valid, the date must be in the format of YYYY-MM-DD")
+		return err
 	}
 
 	data := shared.BookPutRequest{
@@ -94,24 +96,72 @@ func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
 		FieldMask: []string{"author", "description", "publishedAt", "genre", "edition"},
 	}
 
-	b, err := json.Marshal(data)
-	if err != nil {
-		cmd.Println("Failed to created book, please try again")
+	res := shared.ApiResponse[shared.BookPutResponse]{}
+	if err := makeRequest[shared.ApiResponse[shared.BookPutResponse]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {
+		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPut, url, bytes.NewBuffer(b))
-	if err != nil {
-		// handle error
+	cmd.Println("Successfully created book with id: " + res.Data.ID)
+
+	return nil
+}
+
+//
+// Create Collection
+//
+
+func NewCmdCreateCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
+	return &cmdCreateCollection{
+		httpClient: httpClient,
+		host:       host,
+		protocol:   protocol,
+	}
+}
+
+type cmdCreateCollection struct {
+	httpClient *http.Client
+
+	bookIDs *[]string
+
+	host     *string
+	protocol *string
+}
+
+func (c *cmdCreateCollection) Command() *cobra.Command {
+	cmd := &cobra.Command{}
+	cmd.Use = "collection [title]"
+	cmd.Short = "Creates a book collection with the specified title"
+	cmd.Long = "Creates a collection book with the specified title. Addtionall you can specify with book ids are apart of the collection"
+	cmd.RunE = c.Run
+	cmd.Example = "libraryapp create collection \"The Lord of the Rings Trilogy\" --bookids=d95647a8-0c0e-43df-9104-86452accbe8a"
+
+	// Book specific args
+	c.bookIDs = cmd.Flags().StringArray("bookids", []string{}, "A list of ids of books to add to the collection this must a list of uuids in the form of [\"5457843e-47bf-4bcd-8ecd-294cf584f661\", \"58f33b0e-d543-4330-acde-789f15114822\"]")
+
+	// Book specified
+	cmd.Args = cobra.ExactArgs(1)
+
+	return cmd
+}
+
+func (c *cmdCreateCollection) Run(cmd *cobra.Command, args []string) error {
+	data := shared.CollectionPutRequest{
+		Name:    args[0],
+		BookIDs: *c.bookIDs,
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		cmd.Println("Failed to created book, please try again" + err.Error())
-		return nil
+	if err := data.Validate(); err != nil {
+		return err
 	}
-	defer resp.Body.Close()
+
+	url := *c.protocol + "://" + *c.host + "/v1/collection"
+
+	res := shared.ApiResponse[shared.CollectionPutResponse]{}
+	if err := makeRequest[shared.ApiResponse[shared.CollectionPutResponse]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {
+		return err
+	}
+
+	cmd.Println("Successfully created collection of books with id: " + res.Data.ID)
 
 	return nil
 }

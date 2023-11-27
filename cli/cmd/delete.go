@@ -7,16 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type cmdDelete struct {
-	host     *string
-	protocol *string
-}
+type cmdDelete struct{}
 
-func NewCmdDelete(host *string, protocol *string) Cmd {
-	return &cmdDelete{
-		host:     host,
-		protocol: protocol,
-	}
+func NewCmdDelete() Cmd {
+	return &cmdDelete{}
 }
 
 func (c *cmdDelete) Command() *cobra.Command {
@@ -68,13 +62,14 @@ func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	url := *c.protocol + "://" + *c.host + "/v1/book"
-	err := makeRequest(&data, url, http.MethodDelete, c.httpClient)
+	err := makeRequest[any](&data, nil, url, http.MethodDelete, c.httpClient)
 	if err != nil {
-		cmd.Println("Failed to delete book with error: ", err)
 		return err
 	}
 
-	return err
+	cmd.Println("Successfully deleted the book")
+
+	return nil
 }
 
 //
@@ -88,7 +83,7 @@ type cmdDeleteCollection struct {
 	protocol *string
 }
 
-func NewCmdCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdDeleteCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
 	return &cmdDeleteBook{
 		httpClient: httpClient,
 		host:       host,
@@ -110,17 +105,17 @@ func (c *cmdDeleteCollection) Command() *cobra.Command {
 	return cmd
 }
 
-func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
-	data := shared.BookDeleteRequest{
+func (c *cmdDeleteCollection) Run(cmd *cobra.Command, args []string) error {
+	data := shared.CollectionDeleteRequest{
 		ID: args[0],
 	}
 
 	url := *c.protocol + "://" + *c.host + "/v1/collection"
-	err := makeRequest(&data, url, http.MethodDelete, c.httpClient)
-	if err != nil {
-		cmd.Println("Failed to delete book with error: ", err)
+	if err := makeRequest[any](&data, nil, url, http.MethodDelete, c.httpClient); err != nil {
 		return err
 	}
 
-	return err
+	cmd.Println("Successfully deleted the book collection")
+
+	return nil
 }

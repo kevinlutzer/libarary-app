@@ -1,9 +1,44 @@
 package shared
 
 import (
-	"slices"
 	"time"
 )
+
+type BookGetRequest struct {
+	IDs        []string  `json:"ids"`
+	Author     string    `json:"author"`
+	Genre      string    `json:"genre"`
+	RangeStart time.Time `json:"rangeStart"`
+	RangeEnd   time.Time `json:"rangeEnd"`
+}
+
+func (req *BookGetRequest) Validate() error {
+	if len(req.IDs) > 0 {
+		for _, id := range req.IDs {
+			if !IsValidID(id) {
+				return NewError(InvalidArguments, "an id specified is not a valid id")
+			}
+		}
+	}
+
+	if req.Author != "" && len(req.Author) > 512 {
+		return NewError(InvalidArguments, "author must be less than 512 characters")
+	}
+
+	if req.Genre != "" && !IsValidGenre(req.Genre) {
+		return NewError(InvalidArguments, "genre is not one of the valid genres: "+ValidGenreStr)
+	}
+
+	if !req.RangeStart.IsZero() && !req.RangeEnd.IsZero() && req.RangeStart.After(req.RangeEnd) {
+		return NewError(InvalidArguments, "range start must be before range end")
+	}
+
+	if !req.RangeStart.IsZero() && req.RangeStart.After(time.Now()) {
+		return NewError(InvalidArguments, "range start must be before now")
+	}
+
+	return nil
+}
 
 type BookPostRequest struct {
 	ID        string    `json:"id"`
@@ -53,13 +88,8 @@ func (req *BookData) Validate() error {
 		errMsg = "description is required and must be less than 4046 characters"
 	}
 
-	if req.Genre != "" && !slices.Contains(Genres, Genre(req.Genre)) {
-		var genreStr string
-		for _, genre := range Genres {
-			genreStr += string(genre) + ", "
-		}
-
-		errMsg = "genre is not one of the valid genres: " + genreStr
+	if !IsValidGenre(req.Genre) {
+		errMsg = "genre is not one of the valid genres: " + ValidGenreStr
 	}
 
 	if req.Edition > 255 {
@@ -90,4 +120,16 @@ func (req *BookPutRequest) Validate() error {
 	}
 
 	return req.Data.Validate()
+}
+
+//
+// Responses
+//
+
+type BookPutResponse struct {
+	ID string `json:"id"`
+}
+
+type BookLoadResponse struct {
+	Books []map[string]interface{} `json:"books"`
 }

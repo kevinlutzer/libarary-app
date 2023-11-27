@@ -1,7 +1,5 @@
 package shared
 
-import "fmt"
-
 type ErrorType string
 
 const (
@@ -12,12 +10,12 @@ const (
 )
 
 type AppError struct {
-	Type ErrorType
-	Msg  string
+	Type ErrorType `json:"errorType"`
+	Msg  string    `json:"msg"`
 }
 
 func (r *AppError) Error() string {
-	return fmt.Sprintf("%s: %s", r.Type, r.Msg)
+	return r.Msg
 }
 
 func NewError(errorType ErrorType, msg string) error {

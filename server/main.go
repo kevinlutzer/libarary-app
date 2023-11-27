@@ -2,8 +2,9 @@ package main
 
 import (
 	"errors"
-	"klutzer/conanical-library-app/server/internal/book"
-	"klutzer/conanical-library-app/server/internal/collection"
+	"klutzer/conanical-library-app/server/internal/repo"
+	"klutzer/conanical-library-app/server/internal/rest"
+	"klutzer/conanical-library-app/server/internal/service"
 	"net/http"
 	"os"
 
@@ -27,18 +28,18 @@ func main() {
 	}
 
 	logger.Info("Initializing db")
-	db, err := NewDB()
+	db, err := repo.NewDB()
 	if err != nil {
 		logger.Error("Failed to initialize db ", zap.Error(err))
 	}
 
-	bookRepo := book.NewRepo(db)
-	bookService := book.NewService(bookRepo)
+	bookRepo := repo.NewBookRepo(db)
+	bookService := service.NewBookService(bookRepo)
 
-	collectionRepo := collection.NewRepo(db)
-	collectionService := collection.NewService(collectionRepo, bookService)
+	collectionRepo := repo.NewCollectionRepo(db)
+	collectionService := service.NewCollectionService(collectionRepo, bookService)
 
-	server := NewREST(logger, bookService, collectionService)
+	server := rest.NewREST(logger, bookService, collectionService)
 
 	logger.Info("Starting server")
 	if err := server.ListenAndServe(); err != nil {

@@ -22,6 +22,12 @@ cd server
 PORT=8000 DB_FILE=/tmp/libraryapp/gorm.db go run . --port=8081 --dbfile=/tmp/gorm.db
 ```
 
+##
+
+- [ ] Add tests
+- [ ] Add authentication
+- [ ] Add rate limiting
+
 ## CLI
 
 The CLI uses [cobra]()
