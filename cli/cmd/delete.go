@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	shared "klutzer/conanical-library-app/shared"
 	"net/http"
 
@@ -15,7 +16,7 @@ func NewCmdDelete() Cmd {
 
 func (c *cmdDelete) Command() *cobra.Command {
 	cmd := &cobra.Command{}
-	cmd.Use = "delete [resource]"
+	cmd.Use = "delete"
 	cmd.Short = "Deletes a resource"
 	cmd.Long = "Can delete either a singular book or a book collection."
 	cmd.RunE = c.Run
@@ -44,7 +45,7 @@ func NewCmdDeleteBook(httpClient *http.Client, host *string, protocol *string) C
 
 func (c *cmdDeleteBook) Command() *cobra.Command {
 	cmd := &cobra.Command{}
-	cmd.Use = "book [id]"
+	cmd.Use = "book id"
 	cmd.Short = "Deletes a book with the specified id"
 	cmd.Long = "Deletes a book with the specified id"
 	cmd.RunE = c.Run
@@ -57,8 +58,13 @@ func (c *cmdDeleteBook) Command() *cobra.Command {
 }
 
 func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
-	data := shared.BookDeleteRequest{
-		ID: args[0],
+	id := args[0]
+	if ok := shared.IsValidID(id); !ok {
+		return errors.New("the id specified is not a valid id")
+	}
+
+	data := shared.CollectionDeleteRequest{
+		ID: id,
 	}
 
 	url := *c.protocol + "://" + *c.host + "/v1/book"
@@ -84,7 +90,7 @@ type cmdDeleteCollection struct {
 }
 
 func NewCmdDeleteCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
-	return &cmdDeleteBook{
+	return &cmdDeleteCollection{
 		httpClient: httpClient,
 		host:       host,
 		protocol:   protocol,
@@ -93,7 +99,7 @@ func NewCmdDeleteCollection(httpClient *http.Client, host *string, protocol *str
 
 func (c *cmdDeleteCollection) Command() *cobra.Command {
 	cmd := &cobra.Command{}
-	cmd.Use = "book [id]"
+	cmd.Use = "collection id"
 	cmd.Short = "Deletes a book collection with the specified id"
 	cmd.Long = "Deletes a book collection with the specified id"
 	cmd.RunE = c.Run
@@ -106,8 +112,14 @@ func (c *cmdDeleteCollection) Command() *cobra.Command {
 }
 
 func (c *cmdDeleteCollection) Run(cmd *cobra.Command, args []string) error {
+
+	id := args[0]
+	if ok := shared.IsValidID(id); !ok {
+		return errors.New("the id specified is not a valid id")
+	}
+
 	data := shared.CollectionDeleteRequest{
-		ID: args[0],
+		ID: id,
 	}
 
 	url := *c.protocol + "://" + *c.host + "/v1/collection"

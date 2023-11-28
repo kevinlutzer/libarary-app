@@ -3,10 +3,12 @@ package shared
 type ErrorType string
 
 const (
-	AlreadyExists    ErrorType = "AlreadyExists"
-	NotFound         ErrorType = "NotFound"
-	Internal         ErrorType = "Internal"
-	InvalidArguments ErrorType = "InvalidArguments"
+	AlreadyExists      ErrorType = "AlreadyExists"
+	NotFound           ErrorType = "NotFound"
+	Internal           ErrorType = "Internal"
+	InvalidArguments   ErrorType = "InvalidArguments"
+	PreconditionFailed ErrorType = "PreconditionFailed"
+	MethodNotAllow     ErrorType = "MethodNotAllow"
 )
 
 type AppError struct {

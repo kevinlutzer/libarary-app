@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"net/url"
+	"strings"
 	"time"
 )
 
@@ -10,6 +12,59 @@ type BookGetRequest struct {
 	Genre      string    `json:"genre"`
 	RangeStart time.Time `json:"rangeStart"`
 	RangeEnd   time.Time `json:"rangeEnd"`
+}
+
+func (r *BookGetRequest) ToQueryStr() string {
+	q := url.Values{}
+
+	if len(r.IDs) > 0 {
+		q.Set("ids", url.QueryEscape(strings.Join(r.IDs, ",")))
+	}
+
+	if r.Author != "" {
+		q.Set("author", url.QueryEscape(r.Author))
+	}
+
+	if r.Genre != "" {
+		q.Set("genre", url.QueryEscape(r.Genre))
+	}
+
+	if !r.RangeStart.IsZero() {
+		q.Set("rangeStart", url.QueryEscape(r.RangeStart.Format(time.RFC3339)))
+	}
+
+	if !r.RangeEnd.IsZero() {
+		q.Set("rangeEnd", url.QueryEscape(r.RangeEnd.Format(time.RFC3339)))
+	}
+
+	return q.Encode()
+}
+
+func (r *BookGetRequest) FromQueryStr(u url.Values) {
+	if ok := u.Has("ids"); ok {
+		ids, _ := url.QueryUnescape(u.Get("ids"))
+		r.IDs = strings.Split(ids, ",")
+	}
+
+	if ok := u.Has("author"); ok {
+		author, _ := url.QueryUnescape(u.Get("author"))
+		r.Author = author
+	}
+
+	if ok := u.Has("genre"); ok {
+		genre, _ := url.QueryUnescape(u.Get("genre"))
+		r.Genre = genre
+	}
+
+	if ok := u.Has("rangeStart"); ok {
+		rangeStart, _ := url.QueryUnescape(u.Get("rangeStart"))
+		r.RangeStart, _ = time.Parse(time.RFC3339, rangeStart)
+	}
+
+	if ok := u.Has("rangeEnd"); ok {
+		rangeEnd, _ := url.QueryUnescape(u.Get("rangeEnd"))
+		r.RangeEnd, _ = time.Parse(time.RFC3339, rangeEnd)
+	}
 }
 
 func (req *BookGetRequest) Validate() error {
@@ -104,9 +159,8 @@ func (req *BookData) Validate() error {
 }
 
 type BookPutRequest struct {
-	Title     string    `json:"title"`
-	FieldMask []string  `json:"field_mask"`
-	Data      *BookData `json:"data"`
+	Data  *BookData `json:"data"`
+	Title string    `json:"title"`
 }
 
 func (req *BookPutRequest) Validate() error {
@@ -114,12 +168,25 @@ func (req *BookPutRequest) Validate() error {
 		return NewError(InvalidArguments, "title is required and must be less than 512 characters")
 	}
 
-	if req.Data == nil {
-		req.Data = &BookData{}
-		return nil
+	if req.Data != nil {
+		return req.Data.Validate()
 	}
 
-	return req.Data.Validate()
+	return nil
+}
+
+//
+// ApiBook Definition
+//
+
+type ApiBook struct {
+	ID          string    `json:"id"`
+	Title       string    `json:"title"`
+	Author      string    `json:"author"`
+	Description string    `json:"description"`
+	PublishedAt time.Time `json:"publishedAt"`
+	Genre       Genre     `json:"genre"`
+	Edition     uint8     `json:"edition"`
 }
 
 //
@@ -131,5 +198,5 @@ type BookPutResponse struct {
 }
 
 type BookLoadResponse struct {
-	Books []map[string]interface{} `json:"books"`
+	Books []ApiBook `json:"books"`
 }

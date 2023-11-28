@@ -93,7 +93,6 @@ func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
 			Genre:       *c.genre,
 			Edition:     *c.edition,
 		},
-		FieldMask: []string{"author", "description", "publishedAt", "genre", "edition"},
 	}
 
 	res := shared.ApiResponse[shared.BookPutResponse]{}
@@ -133,10 +132,10 @@ func (c *cmdCreateCollection) Command() *cobra.Command {
 	cmd.Short = "Creates a book collection with the specified title"
 	cmd.Long = "Creates a collection book with the specified title. Addtionall you can specify with book ids are apart of the collection"
 	cmd.RunE = c.Run
-	cmd.Example = "libraryapp create collection \"The Lord of the Rings Trilogy\" --bookids=d95647a8-0c0e-43df-9104-86452accbe8a"
+	cmd.Example = "libraryapp create collection \"The Lord of the Rings Trilogy\" --bookid=d95647a8-0c0e-43df-9104-86452accbe8a --bookid=1b2b9c1a-2e4d-4f6f-8b1e-9e9b9c1d2e4d --bookid=3c4c5c6c-5c6c-6c7c-7c8c-8c9c9c1d2e4d"
 
 	// Book specific args
-	c.bookIDs = cmd.Flags().StringArray("bookids", []string{}, "A list of ids of books to add to the collection this must a list of uuids in the form of [\"5457843e-47bf-4bcd-8ecd-294cf584f661\", \"58f33b0e-d543-4330-acde-789f15114822\"]")
+	c.bookIDs = cmd.Flags().StringArray("bookid", []string{}, "The id of a book to add to the collection, this can be specified multiple times")
 
 	// Book specified
 	cmd.Args = cobra.ExactArgs(1)

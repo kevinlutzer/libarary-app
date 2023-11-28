@@ -11,9 +11,10 @@ const (
 	Art        Genre = "art"
 	Cooking    Genre = "cooking"
 	Fantasy    Genre = "fantasy"
+	Tragedy    Genre = "tragedy"
 )
 
-var Genres = []Genre{Science, History, Philosophy, Art, Cooking, Fantasy}
+var Genres = []Genre{Science, History, Philosophy, Art, Cooking, Fantasy, Tragedy}
 
 func IsValidGenre(genre string) bool {
 	return genre != "" && slices.Contains(Genres, Genre(genre))

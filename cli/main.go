@@ -52,9 +52,21 @@ func main() {
 
 	getCmd := cmd.NewCmdGet().Command()
 	getBookCmd := cmd.NewCmdGetBook(httpClient, host, protocal).Command()
+	getCollectionCmd := cmd.NewCmdGetCollection(httpClient, host, protocal).Command()
 
 	rootCmd.AddCommand(getCmd)
 	getCmd.AddCommand(getBookCmd)
+	getCmd.AddCommand(getCollectionCmd)
+
+	//
+	// Update Commands
+	//
+
+	updateCmd := cmd.NewCmdUpdate().Command()
+	updateBookCmd := cmd.NewCmdUpdateBook(httpClient, host, protocal).Command()
+
+	rootCmd.AddCommand(updateCmd)
+	updateCmd.AddCommand(updateBookCmd)
 
 	//
 	// Build the command structure

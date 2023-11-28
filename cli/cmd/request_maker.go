@@ -9,16 +9,21 @@ import (
 )
 
 func makeRequest[R any](apiData shared.ApiRequest, apiResp *R, url string, method string, httpClient *http.Client) error {
-	if err := apiData.Validate(); err != nil {
-		return err
+	var body io.Reader
+	if apiData != nil {
+		if err := apiData.Validate(); err != nil {
+			return err
+		}
+
+		b, err := json.Marshal(apiData)
+		if err != nil {
+			return err
+		}
+
+		body = bytes.NewBuffer(b)
 	}
 
-	b, err := json.Marshal(apiData)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(b))
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"klutzer/conanical-library-app/server/internal/model"
 	"klutzer/conanical-library-app/server/internal/repo"
 	"klutzer/conanical-library-app/server/internal/rest"
 	"klutzer/conanical-library-app/server/internal/service"
@@ -32,6 +33,17 @@ func main() {
 	if err != nil {
 		logger.Error("Failed to initialize db ", zap.Error(err))
 	}
+
+	//
+	// Migrate the schemas
+	//
+
+	db.AutoMigrate(&model.Book{})
+	db.AutoMigrate(&model.Collection{})
+
+	//
+	// Initialize services, server and repo
+	//
 
 	bookRepo := repo.NewBookRepo(db)
 	bookService := service.NewBookService(bookRepo)

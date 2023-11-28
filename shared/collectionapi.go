@@ -10,6 +10,14 @@ func (req *CollectionPutRequest) Validate() error {
 		return NewError(InvalidArguments, "name is required and must be less than 512 characters")
 	}
 
+	if len(req.BookIDs) > 0 {
+		for _, id := range req.BookIDs {
+			if !IsValidID(id) {
+				return NewError(InvalidArguments, "an id specified is not a valid id")
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -49,9 +57,23 @@ func (req *CollectionDeleteRequest) Validate() error {
 }
 
 //
+// ApiCollection Definition
+//
+
+type ApiCollection struct {
+	ID    string    `json:"id"`
+	Name  string    `json:"title"`
+	Books []ApiBook `json:"books"`
+}
+
+//
 // Responses
 //
 
 type CollectionPutResponse struct {
 	ID string `json:"id"`
+}
+
+type CollectionLoadResponse struct {
+	Collections []ApiCollection `json:"collections"`
 }
