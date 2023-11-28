@@ -3,18 +3,16 @@ package model
 import (
 	"klutzer/conanical-library-app/shared"
 	"strings"
-	"time"
 
 	"gorm.io/gorm"
 )
 
 type Collection struct {
 	gorm.Model
-	ID        string    `gorm:"primaryKey"`
-	Name      string    `gorm:"size:512"`
-	BookIDs   string    `gorm:"type:text"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	Deleted   bool      `gorm:"default:false"`
+	ID      string `gorm:"primaryKey"`
+	Name    string `gorm:"type:varchar(512)"`
+	BookIDs string `gorm:"type:text"`
+	Deleted bool   `gorm:"default:false"`
 }
 
 func (v *Collection) GetIDs() []string {

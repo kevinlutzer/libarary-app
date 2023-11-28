@@ -22,7 +22,7 @@ var defautError = shared.AppError{
 	Msg:  "Internal error",
 }
 
-func (restService *restService) WriteErrorResponse(w http.ResponseWriter, err error) {
+func (restService *rest) WriteErrorResponse(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	res := shared.ApiResponse[shared.AppError]{
 		Type: "err",
@@ -44,7 +44,7 @@ func (restService *restService) WriteErrorResponse(w http.ResponseWriter, err er
 	return
 }
 
-func (restService *restService) WriteSuccessResponse(w http.ResponseWriter, data any) {
+func (restService *rest) WriteSuccessResponse(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	res := shared.ApiResponse[any]{
 		Type: "success",

@@ -69,8 +69,8 @@ func (c *cmdGetBook) Command() *cobra.Command {
 	c.ids = cmd.Flags().StringArray("id", []string{}, "The id(s) of the books to get can be specified multiple times")
 	c.author = cmd.Flags().String("author", "", "The author of the book, this will be a fuzzy match")
 	c.genre = cmd.Flags().String("genre", "", "The genre of the book, valid genres are: "+shared.ValidGenreStr+"")
-	c.rangeStart = cmd.Flags().String("rangestart", "", "The start of the range of books to get, this must be in the format of 2006-01-02T15:04:05Z07:00")
-	c.rangeEnd = cmd.Flags().String("rangeend", "", "The end of the range of books to get, this must in the format of 2006-01-02T15:04:05Z07:00")
+	c.rangeStart = cmd.Flags().String("publishedstart", "", "The start of the published date range of books to get, this must be in the format of 2006-01-02T15:04:05Z07:00")
+	c.rangeEnd = cmd.Flags().String("publishedend", "", "The end of the published date range of books to get, this must in the format of 2006-01-02T15:04:05Z07:00")
 
 	return cmd
 }

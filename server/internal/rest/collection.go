@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (restService *restService) CollectionHandler(w http.ResponseWriter, r *http.Request) {
+func (restService *rest) CollectionHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
@@ -148,6 +148,4 @@ func (restService *restService) CollectionHandler(w http.ResponseWriter, r *http
 		restService.WriteSuccessResponse(w, nil)
 		return
 	}
-
-	w.WriteHeader(http.StatusMethodNotAllowed)
 }

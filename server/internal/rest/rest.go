@@ -3,7 +3,6 @@ package rest
 import (
 	"klutzer/conanical-library-app/server/internal/service"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -18,34 +17,45 @@ var apis = []string{
 	apiBook, apiCollection,
 }
 
-type restService struct {
+type Rest interface {
+	ListenAndServe() error
+	BookHandler(w http.ResponseWriter, r *http.Request)
+	CollectionHandler(w http.ResponseWriter, r *http.Request)
+}
+
+type rest struct {
 	logger            *zap.Logger
 	bookService       service.BookService
 	collectionService service.CollectionService
+	server            *http.Server
 }
 
-func NewREST(logger *zap.Logger, bookService service.BookService, collectionService service.CollectionService) *http.Server {
+func NewREST(logger *zap.Logger, bookService service.BookService, collectionService service.CollectionService, port string) Rest {
 	mux := mux.NewRouter()
 
 	mux.StrictSlash(false)
 	mux.SkipClean(true)
 
-	restService := &restService{
+	restServer := &rest{
 		logger:            logger,
 		bookService:       bookService,
 		collectionService: collectionService,
+		server: &http.Server{
+			Addr:    ":" + port,
+			Handler: mux,
+		},
 	}
 
-	mux.HandleFunc(apiBook, restService.BookHandler)
-	mux.HandleFunc(apiCollection, restService.CollectionHandler)
+	mux.HandleFunc(apiBook, restServer.BookHandler)
+	mux.HandleFunc(apiCollection, restServer.CollectionHandler)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	return restServer
+}
 
-	return &http.Server{
-		Addr:    ":" + port,
-		Handler: mux,
-	}
+func (restServer *rest) ListenAndServe() error {
+	return restServer.server.ListenAndServe()
+}
+
+func (restServer *rest) Stop() error {
+	return restServer.server.Close()
 }

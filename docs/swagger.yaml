@@ -1,0 +1,34 @@
+basePath: /v1
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: kevinlutzer@proton.me
+    name: Kevin Lutzer
+  description: This is a sample server to manage books and ocllections of books
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Library App REST Server
+  version: "1.0"
+paths:
+  /book:
+    get:
+      consumes:
+      - application/json
+      description: can create, update, delete a single book or read a list of books
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Manage or read a book
+      tags:
+      - book
+swagger: "2.0"
