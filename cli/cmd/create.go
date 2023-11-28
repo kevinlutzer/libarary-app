@@ -49,6 +49,7 @@ type cmdCreateBook struct {
 	publishedAt *string
 	genre       *string
 	edition     *uint8
+	id          *string
 
 	host     *string
 	protocol *string
@@ -68,6 +69,7 @@ func (c *cmdCreateBook) Command() *cobra.Command {
 	c.publishedAt = cmd.Flags().String("published", "1970-01-01", "The data the book was published")
 	c.genre = cmd.Flags().String("genre", "", "The genre of the book, valid genres are: "+shared.ValidGenreStr+"")
 	c.edition = cmd.Flags().Uint8("edition", 1, "The edition of the book")
+	c.id = cmd.Flags().String("id", "", "The id of the book, if not provided a new id will be generated")
 
 	// Book specified
 	cmd.Args = cobra.ExactArgs(1)
@@ -86,6 +88,7 @@ func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
 
 	data := shared.BookPutRequest{
 		Title: args[0],
+		ID:    *c.id,
 		Data: &shared.BookData{
 			Author:      *c.author,
 			Description: *c.description,

@@ -159,13 +159,20 @@ func (req *BookData) Validate() error {
 }
 
 type BookPutRequest struct {
-	Data  *BookData `json:"data"`
-	Title string    `json:"title"`
+	ID    string    `json:"id"`    // optional
+	Data  *BookData `json:"data"`  // optional
+	Title string    `json:"title"` // required
 }
 
 func (req *BookPutRequest) Validate() error {
 	if req.Title == "" || len(req.Title) > 512 {
 		return NewError(InvalidArguments, "title is required and must be less than 512 characters")
+	}
+
+	if req.ID != "" {
+		if ok := IsValidID(req.ID); !ok {
+			return NewError(InvalidArguments, InvalidIdMsg)
+		}
 	}
 
 	if req.Data != nil {

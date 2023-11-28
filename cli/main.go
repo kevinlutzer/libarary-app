@@ -64,9 +64,11 @@ func main() {
 
 	updateCmd := cmd.NewCmdUpdate().Command()
 	updateBookCmd := cmd.NewCmdUpdateBook(httpClient, host, protocal).Command()
+	updateCollectionCmd := cmd.NewCmdUpdateCollection(httpClient, host, protocal).Command()
 
 	rootCmd.AddCommand(updateCmd)
 	updateCmd.AddCommand(updateBookCmd)
+	updateCmd.AddCommand(updateCollectionCmd)
 
 	//
 	// Build the command structure

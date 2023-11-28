@@ -60,7 +60,7 @@ func (c *cmdDeleteBook) Command() *cobra.Command {
 func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
 	id := args[0]
 	if ok := shared.IsValidID(id); !ok {
-		return errors.New("the id specified is not a valid id")
+		return errors.New(shared.InvalidIdMsg)
 	}
 
 	data := shared.CollectionDeleteRequest{
@@ -115,7 +115,7 @@ func (c *cmdDeleteCollection) Run(cmd *cobra.Command, args []string) error {
 
 	id := args[0]
 	if ok := shared.IsValidID(id); !ok {
-		return errors.New("the id specified is not a valid id")
+		return errors.New(shared.InvalidIdMsg)
 	}
 
 	data := shared.CollectionDeleteRequest{

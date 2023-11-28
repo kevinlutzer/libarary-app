@@ -22,7 +22,11 @@ cd server
 PORT=8000 DB_FILE=/tmp/libraryapp/gorm.db go run . --port=8081 --dbfile=/tmp/gorm.db
 ```
 
-##
+## Documents
+
+- [Part 1: ](./docs/part1.md)
+- [Part 2: ](./docs/part2.md)
+- [Part 3: ](./docs/part3.md)
 
 - [ ] Add tests
 - [ ] Add authentication
