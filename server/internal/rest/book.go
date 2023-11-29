@@ -2,7 +2,6 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	shared "klutzer/conanical-library-app/shared"
 	"net/http"
@@ -10,21 +9,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// BookHandler godoc
-// @Summary      Manage or read a book
-// @Description  can create, update, delete a single book or read a list of books
-// @Tags         book
-// @Accept       json
-// @Produce      json
-// @Param        id   path      int  true  "Account ID"
-// @Router       /book [get]
 func (restService *rest) BookHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodOptions {
 		return
 	}
-
-	m := shared.ApiBook{}
-	fmt.Printf("\n\nm %+v\n\n", m)
 
 	// Make sure we are getting the right method
 	if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodPost && r.Method != http.MethodDelete {

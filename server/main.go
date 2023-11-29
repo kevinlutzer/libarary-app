@@ -2,12 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"klutzer/conanical-library-app/server/internal/model"
 	"klutzer/conanical-library-app/server/internal/repo"
 	"klutzer/conanical-library-app/server/internal/rest"
 	"klutzer/conanical-library-app/server/internal/service"
-	shared "klutzer/conanical-library-app/shared"
 	"net/http"
 	"os"
 
@@ -21,25 +19,7 @@ const (
 	ErrServerErrored = 7
 )
 
-// @title           Library App REST Server
-// @version         1.0
-// @description     This is a sample server to manage books and ocllections of books
-
-// @contact.name   Kevin Lutzer
-// @contact.email    kevinlutzer@proton.me
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /v1
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
-
-	m := shared.ApiBook{}
-	fmt.Printf("\n\nm %+v\n\n", m)
 
 	// Initialize logger with the Development configuration. This formats the logs to be easily read on Stdout.
 	// NewProduction() formats the logs by default in a json format meant for log aggregators
@@ -49,7 +29,17 @@ func main() {
 	}
 
 	logger.Info("Initializing db")
-	db, err := repo.NewDB()
+
+	//
+	// Initialize db
+	//
+
+	dbFile := os.Getenv("DB_FILE")
+	if dbFile == "" {
+		dbFile = "gorm.db"
+	}
+
+	db, err := repo.NewDB(dbFile)
 	if err != nil {
 		logger.Error("Failed to initialize db ", zap.Error(err))
 	}
@@ -57,8 +47,6 @@ func main() {
 	//
 	// Migrate the schemas
 	//
-
-	db.Statement.Debug()
 
 	db.AutoMigrate(&model.Book{})
 	db.AutoMigrate(&model.Collection{})

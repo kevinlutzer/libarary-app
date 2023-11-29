@@ -18,6 +18,7 @@ var apis = []string{
 }
 
 type Rest interface {
+	Close() error
 	ListenAndServe() error
 	BookHandler(w http.ResponseWriter, r *http.Request)
 	CollectionHandler(w http.ResponseWriter, r *http.Request)
@@ -56,6 +57,6 @@ func (restServer *rest) ListenAndServe() error {
 	return restServer.server.ListenAndServe()
 }
 
-func (restServer *rest) Stop() error {
+func (restServer *rest) Close() error {
 	return restServer.server.Close()
 }

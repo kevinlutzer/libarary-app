@@ -182,10 +182,9 @@ func (req *BookPutRequest) Validate() error {
 	return nil
 }
 
+// ApiBook represents the api definition of the book
 //
-// ApiBook Definition
-//
-
+// swagger:model
 type ApiBook struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
@@ -196,14 +195,16 @@ type ApiBook struct {
 	Edition     uint8     `json:"edition"`
 }
 
+// BookPutResponse is the response from the PUT /v1/book API
 //
-// Responses
-//
-
+// swagger:model
 type BookPutResponse struct {
 	ID string `json:"id"`
 }
 
-type BookLoadResponse struct {
+// BookLoadResponse is the response from the GET /v1/book API
+//
+// swagger:model
+type BookLoadResponse = ApiResponse[struct {
 	Books []ApiBook `json:"books"`
-}
+}]
