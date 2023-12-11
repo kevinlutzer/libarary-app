@@ -17,9 +17,6 @@ func main() {
 		Use: "libraryapp",
 	}
 
-	host := rootCmd.Flags().String("host", "localhost:8080", "The host the server is on, including the port")
-	protocal := rootCmd.Flags().String("protocol", "http", "The protocol to use when making the request")
-
 	//
 	// Create commands
 	//
@@ -27,8 +24,8 @@ func main() {
 	httpClient := &http.Client{}
 
 	createCmd := cmd.NewCmdCreate().Command()
-	createBookCmd := cmd.NewCmdCreateBook(httpClient, host, protocal).Command()
-	createCollection := cmd.NewCmdCreateCollection(httpClient, host, protocal).Command()
+	createBookCmd := cmd.NewCmdCreateBook(httpClient).Command()
+	createCollection := cmd.NewCmdCreateCollection(httpClient).Command()
 
 	rootCmd.AddCommand(createCmd)
 	createCmd.AddCommand(createBookCmd)
@@ -39,8 +36,8 @@ func main() {
 	//
 
 	deleteCmd := cmd.NewCmdDelete().Command()
-	deleteBookCmd := cmd.NewCmdDeleteBook(httpClient, host, protocal).Command()
-	deleteCollectionCmd := cmd.NewCmdDeleteCollection(httpClient, host, protocal).Command()
+	deleteBookCmd := cmd.NewCmdDeleteBook(httpClient).Command()
+	deleteCollectionCmd := cmd.NewCmdDeleteCollection(httpClient).Command()
 
 	rootCmd.AddCommand(deleteCmd)
 	deleteCmd.AddCommand(deleteBookCmd)
@@ -51,24 +48,24 @@ func main() {
 	//
 
 	getCmd := cmd.NewCmdGet().Command()
-	getBookCmd := cmd.NewCmdGetBook(httpClient, host, protocal).Command()
-	getCollectionCmd := cmd.NewCmdGetCollection(httpClient, host, protocal).Command()
+	getBookCmd := cmd.NewCmdGetBook(httpClient).Command()
+	getCollectionCmd := cmd.NewCmdGetCollection(httpClient).Command()
 
-	rootCmd.AddCommand(getCmd)
 	getCmd.AddCommand(getBookCmd)
 	getCmd.AddCommand(getCollectionCmd)
+	rootCmd.AddCommand(getCmd)
 
 	//
 	// Update Commands
 	//
 
 	updateCmd := cmd.NewCmdUpdate().Command()
-	updateBookCmd := cmd.NewCmdUpdateBook(httpClient, host, protocal).Command()
-	updateCollectionCmd := cmd.NewCmdUpdateCollection(httpClient, host, protocal).Command()
+	updateBookCmd := cmd.NewCmdUpdateBook(httpClient).Command()
+	updateCollectionCmd := cmd.NewCmdUpdateCollection(httpClient).Command()
 
-	rootCmd.AddCommand(updateCmd)
 	updateCmd.AddCommand(updateBookCmd)
 	updateCmd.AddCommand(updateCollectionCmd)
+	rootCmd.AddCommand(updateCmd)
 
 	//
 	// Build the command structure

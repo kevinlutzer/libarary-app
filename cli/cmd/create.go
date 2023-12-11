@@ -22,6 +22,11 @@ func (c *cmdCreate) Command() *cobra.Command {
 	cmd.Long = "Can create either a book or a collection of books. Additional options can be specified to provide more details about the resource."
 	cmd.RunE = c.Run
 
+	// Hostname
+	cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
+	cmd.Args = cobra.ExactArgs(2)
+
 	return cmd
 }
 
@@ -33,11 +38,9 @@ func (c *cmdCreate) Run(cmd *cobra.Command, args []string) error {
 // Create Book
 //
 
-func NewCmdCreateBook(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdCreateBook(httpClient *http.Client) Cmd {
 	return &cmdCreateBook{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -51,8 +54,7 @@ type cmdCreateBook struct {
 	edition     *uint8
 	id          *string
 
-	host     *string
-	protocol *string
+	host *string
 }
 
 func (c *cmdCreateBook) Command() *cobra.Command {
@@ -74,11 +76,14 @@ func (c *cmdCreateBook) Command() *cobra.Command {
 	// Book specified
 	cmd.Args = cobra.ExactArgs(1)
 
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
 	return cmd
 }
 
 func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
-	url := *c.protocol + "://" + *c.host + "/v1/book"
+	url := "http://" + *c.host + "/v1/book"
 
 	tt, err := time.Parse(time.DateOnly, *c.publishedAt)
 	if err != nil {
@@ -112,11 +117,9 @@ func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
 // Create Collection
 //
 
-func NewCmdCreateCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdCreateCollection(httpClient *http.Client) Cmd {
 	return &cmdCreateCollection{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -125,8 +128,7 @@ type cmdCreateCollection struct {
 
 	bookIDs *[]string
 
-	host     *string
-	protocol *string
+	host *string
 }
 
 func (c *cmdCreateCollection) Command() *cobra.Command {
@@ -139,6 +141,9 @@ func (c *cmdCreateCollection) Command() *cobra.Command {
 
 	// Book specific args
 	c.bookIDs = cmd.Flags().StringArray("bookid", []string{}, "The id of a book to add to the collection, this can be specified multiple times")
+
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
 
 	// Book specified
 	cmd.Args = cobra.ExactArgs(1)
@@ -156,7 +161,7 @@ func (c *cmdCreateCollection) Run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	url := *c.protocol + "://" + *c.host + "/v1/collection"
+	url := "http://" + *c.host + "/v1/collection"
 
 	res := shared.ApiResponse[shared.CollectionPutResponse]{}
 	if err := makeRequest[shared.ApiResponse[shared.CollectionPutResponse]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {

@@ -18,10 +18,15 @@ type cmdGet struct {
 
 func (c *cmdGet) Command() *cobra.Command {
 	cmd := &cobra.Command{}
-	cmd.Use = "get [resource]"
+	cmd.Use = "get resource"
 	cmd.Short = "Gets a list of the resource"
 	cmd.Long = "Can either get a list of books or a collection of books. Additional options can be specified to filter the resource"
 	cmd.RunE = c.Run
+
+	// Hostname
+	cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
+	cmd.Args = cobra.ExactArgs(1)
 
 	return cmd
 }
@@ -37,22 +42,19 @@ func (c *cmdGet) Run(cmd *cobra.Command, args []string) error {
 type cmdGetBook struct {
 	httpClient *http.Client
 
-	host     *string
-	protocol *string
+	host *string
 
-	title      *string
-	ids        *[]string
-	author     *string
-	genre      *string
-	rangeStart *string
-	rangeEnd   *string
+	title          *string
+	ids            *[]string
+	author         *string
+	genre          *string
+	publishedStart *string
+	publishedEnd   *string
 }
 
-func NewCmdGetBook(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdGetBook(httpClient *http.Client) Cmd {
 	return &cmdGetBook{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -69,8 +71,11 @@ func (c *cmdGetBook) Command() *cobra.Command {
 	c.ids = cmd.Flags().StringArray("id", []string{}, "The id(s) of the books to get can be specified multiple times")
 	c.author = cmd.Flags().String("author", "", "The author of the book, this will be a fuzzy match")
 	c.genre = cmd.Flags().String("genre", "", "The genre of the book, valid genres are: "+shared.ValidGenreStr+"")
-	c.rangeStart = cmd.Flags().String("publishedstart", "", "The start of the published date range of books to get, this must be in the format of 2006-01-02T15:04:05Z07:00")
-	c.rangeEnd = cmd.Flags().String("publishedend", "", "The end of the published date range of books to get, this must in the format of 2006-01-02T15:04:05Z07:00")
+	c.publishedStart = cmd.Flags().String("publishedstart", "", "The start of the published date range of books to get, this must be in the format of 2006-01-02")
+	c.publishedEnd = cmd.Flags().String("publishedend", "", "The end of the published date range of books to get, this must in the format of 2006-01-02")
+
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
 
 	return cmd
 }
@@ -83,26 +88,28 @@ func (c *cmdGetBook) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	// Parse/Check Range Start
-	if *c.rangeStart != "" {
-		t, err := time.Parse(time.RFC3339, *c.rangeStart)
+	if *c.publishedStart != "" {
+		t, err := time.Parse(time.DateOnly, *c.publishedStart)
 		if err != nil {
-			return errors.New("range start must be in the format of 2006-01-02T15:04:05Z07:00")
+			return errors.New("published start must be in the format of 2006-01-02")
 		}
 		data.RangeStart = t
 	}
 
 	// Parse/Check Range End
-	if *c.rangeEnd != "" {
-		t, err := time.Parse(time.RFC3339, *c.rangeEnd)
+	if *c.publishedEnd != "" {
+		t, err := time.Parse(time.DateOnly, *c.publishedEnd)
 		if err != nil {
-			return errors.New("range end must be in the format of 2006-01-02T15:04:05Z07:00")
+			return errors.New("published end must be in the format of 2006-01-02")
 		}
 		data.RangeEnd = t
 	}
 
 	resp := shared.ApiResponse[shared.BookLoadResponse]{}
 
-	u := *c.protocol + "://" + *c.host + "/v1/book?" + data.ToQueryStr()
+	u := "http://" + *c.host + "/v1/book?" + data.ToQueryStr()
+
+	cmd.Println(u)
 	err := makeRequest[shared.ApiResponse[shared.BookLoadResponse]](nil, &resp, u, http.MethodGet, c.httpClient)
 	if err != nil {
 		return err
@@ -134,17 +141,14 @@ func (c *cmdGetBook) Run(cmd *cobra.Command, args []string) error {
 type cmdGetCollection struct {
 	httpClient *http.Client
 
-	host     *string
-	protocol *string
+	host *string
 
 	includeBooks *bool
 }
 
-func NewCmdGetCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdGetCollection(httpClient *http.Client) Cmd {
 	return &cmdGetCollection{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -157,7 +161,11 @@ func (c *cmdGetCollection) Command() *cobra.Command {
 	cmd.RunE = c.Run
 	cmd.Example = "libraryapp get collection"
 
+	// Additional Argss
 	c.includeBooks = cmd.Flags().Bool("includebooks", false, "Include the books in the collection")
+
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
 
 	return cmd
 }
@@ -166,7 +174,7 @@ func (c *cmdGetCollection) Run(cmd *cobra.Command, args []string) error {
 
 	resp := shared.ApiResponse[shared.CollectionLoadResponse]{}
 
-	u := *c.protocol + "://" + *c.host + "/v1/collection"
+	u := "http://" + *c.host + "/v1/collection"
 	if *c.includeBooks {
 		u += "?includebooks=true"
 	}

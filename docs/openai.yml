@@ -1,0 +1,336 @@
+openapi: 3.0.3
+info:
+  title: Book App
+  version: 1.0.0
+  contact: {
+    name: Kevin Lutzer,
+    email: kevinlutzer@proton.me
+  }
+servers:
+  - url: 'localhost:8000'
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "b659067a-2714-4711-bb8a-88a2779d06ac"
+        title:
+          type: string
+          example: "Harry Potter and the Philosopher's Stone"
+        author:
+          type: string
+          example: "JK Rowling"
+        description:
+          type: string
+          example: "Harry is an orphan living with his abusive aunt and uncle, Vernon and Petunia Dursley and their bullying son, Dudley. On his eleventh birthday, Harry discovers he is a wizard when Rubeus Hagrid delivers him an acceptance letter to Hogwarts School of Witchcraft and Wizardry."
+        edition:
+          type: number
+          example: 1
+        genre:
+          type: string
+          example: "fantasy"        
+    ErrorResponse:
+      type: object
+      required:
+      - errorType
+      - msg
+      properties:
+        msg:
+          type: string
+          example: "error message"
+        errorType:
+          type: string
+          example: "NotFound"
+paths:
+  /v1/collection:
+      get:
+        summary: Get Collections
+        description: Loads all collections. There are are options to filter the results.
+        operationId: get
+        parameters:
+          - name: includebooks
+            in: query
+            schema:
+              type: boolean
+              example: 'true'
+        responses:
+          '200':
+            description: ''
+      put:
+        summary: Create Collection
+        description: Creates a singular book book. The request body contains the details for the book collection that is to be created.
+        operationId: create
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookIDs:
+                    type: array
+                    items:
+                      type: string
+                      example: b43d571c-0b02-4fb1-89dc-a52431750980
+                    example:
+                      - b43d571c-0b02-4fb1-89dc-a52431750980
+                  name:
+                    type: string
+                    example: harry potter books
+              examples:
+                Create:
+                  value:
+                    bookIDs:
+                      - b43d571c-0b02-4fb1-89dc-a52431750980
+                    name: harry potter books
+        responses:
+          '200':
+            description: ''
+      post:
+        summary: Update
+        description: Update
+        operationId: update
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      bookIDs:
+                        type: array
+                        items:
+                          type: string
+                          example: 4b98ee52-67c0-44ad-a362-2925fa1b9046
+                        example:
+                          - 4b98ee52-67c0-44ad-a362-2925fa1b9046
+                      name:
+                        type: string
+                        example: harry potter books
+                  fieldMask:
+                    type: array
+                    items:
+                      type: string
+                      example: name
+                    example:
+                      - name
+                      - bookIDs
+                  id:
+                    type: string
+                    example: e89f4a37-512d-4d25-9bb5-004fb13e7c71
+              examples:
+                Update:
+                  value:
+                    data:
+                      bookIDs:
+                        - 4b98ee52-67c0-44ad-a362-2925fa1b9046
+                      name: harry potter books
+                    fieldMask:
+                      - name
+                      - bookIDs
+                    id: e89f4a37-512d-4d25-9bb5-004fb13e7c71
+        responses:
+          '200':
+            description: ''
+      delete:
+        summary: Delete
+        description: Delete
+        operationId: delete
+        parameters:
+          - name: id
+            in: query
+            schema:
+              type: string
+              example: e89f4a37-512d-4d25-9bb5-004fb13e7c71
+        responses:
+          '200':
+            description: ''
+  /v1/book:
+    get:
+      summary: Get Collection
+      description: Loads all books. There are are options to filter the results.
+      operationId: get
+      parameters:
+        - name: author
+          in: query
+          schema:
+            type: string
+            example: JK%2BRowling
+        - name: genre
+          in: query
+          schema:
+            type: string
+            example: fantasy
+        - name: rangeEnd
+          in: query
+          schema:
+            type: string
+            example: 2023-01-02T00%253A00%253A00Z
+        - name: rangeStart
+          in: query
+          schema:
+            type: string
+            example: 1954-07-11T00%253A00%253A00Z
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+            examples:
+              Get:
+                value: {}
+      responses:
+        '200':
+          description: ''
+    put:
+      summary: Create Collection
+      description: Creates a singular book collection. The request body contains the details for the collection that is to be created.
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    author:
+                      type: string
+                      required: true
+                      example: JK Rowling
+                    description:
+                      type: string
+                      example: >-
+                        Harry is an orphan living with his abusive aunt and
+                        uncle, Vernon and Petunia Dursley and their bullying
+                        son, Dudley. On his eleventh birthday, Harry discovers
+                        he is a wizard when Rubeus Hagrid delivers him an
+                        acceptance letter to Hogwarts School of Witchcraft and
+                        Wizardry.
+                    edition:
+                      type: number
+                      example: 1
+                    genre:
+                      type: string
+                      example: fantasy
+                    publishedAt:
+                      type: string
+                      example: '2001-01-01T15:04:05Z'
+                title:
+                  type: string
+                  example: Harry Potter and the Philosopher's Stone
+            examples:
+              Create:
+                value:
+                  data:
+                    author: JK Rowling
+                    description: >-
+                      Harry is an orphan living with his abusive aunt and uncle,
+                      Vernon and Petunia Dursley and their bullying son, Dudley.
+                      On his eleventh birthday, Harry discovers he is a wizard
+                      when Rubeus Hagrid delivers him an acceptance letter to
+                      Hogwarts School of Witchcraft and Wizardry.
+                    edition: 1
+                    genre: fantasy
+                    publishedAt: '2001-01-01T15:04:05Z'
+                  title: Harry Potter and the Philosopher's Stone
+      responses:
+        '200':
+          description: ''
+    post:
+      summary: Update
+      description: Update
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    author:
+                      type: string
+                      example: JK Rowling 2
+                    description:
+                      type: string
+                      example: >-
+                        Harry is a cool orphan living with his abusive aunt and
+                        uncle, Vernon and Petunia Dursley and their bullying
+                        son, Dudley. On his eleventh birthday, Harry discovers
+                        he is a wizard when Rubeus Hagrid delivers him an
+                        acceptance letter to Hogwarts School of Witchcraft and
+                        Wizardry.
+                    edition:
+                      type: number
+                      example: 2
+                    genre:
+                      type: string
+                      example: art
+                    publishedAt:
+                      type: string
+                      example: '2002-01-01T15:04:05Z'
+                fieldMask:
+                  type: array
+                  items:
+                    type: string
+                    example: author
+                  example:
+                    - author
+                    - genre
+                    - edition
+                    - publishedAt
+                    - description
+                id:
+                  type: string
+                  example: 4b98ee52-67c0-44ad-a362-2925fa1b9046
+            examples:
+              Update:
+                value:
+                  data:
+                    author: JK Rowling 2
+                    description: >-
+                      Harry is a cool orphan living with his abusive aunt and
+                      uncle, Vernon and Petunia Dursley and their bullying son,
+                      Dudley. On his eleventh birthday, Harry discovers he is a
+                      wizard when Rubeus Hagrid delivers him an acceptance
+                      letter to Hogwarts School of Witchcraft and Wizardry.
+                    edition: 2
+                    genre: art
+                    publishedAt: '2002-01-01T15:04:05Z'
+                  fieldMask:
+                    - author
+                    - genre
+                    - edition
+                    - publishedAt
+                    - description
+                  id: 4b98ee52-67c0-44ad-a362-2925fa1b9046
+      responses:
+        '200':
+          description: ''
+    delete:
+      summary: Delete
+      description: Delete
+      operationId: delete
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+            example: 314ce504-083d-4107-bf92-922f501c7f5c
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Delete:
+                value: ''
+      responses:
+        '200':
+          description: ''
+tags: []

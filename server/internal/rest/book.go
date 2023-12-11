@@ -10,9 +10,6 @@ import (
 )
 
 func (restService *rest) BookHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		return
-	}
 
 	// Make sure we are getting the right method
 	if r.Method != http.MethodGet && r.Method != http.MethodPut && r.Method != http.MethodPost && r.Method != http.MethodDelete {
@@ -123,20 +120,16 @@ func (restService *rest) BookHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Delete operation
 	if r.Method == http.MethodDelete {
-		req := shared.BookDeleteRequest{}
-		if err := json.Unmarshal([]byte(b), &req); err != nil {
-			err := shared.NewError(shared.InvalidArguments, err.Error())
+
+		if !r.URL.Query().Has("id") {
+			err := shared.NewError(shared.InvalidArguments, "id is required as a query param")
 			restService.WriteErrorResponse(w, err)
 			return
 		}
 
-		// Validate request
-		if err := req.Validate(); err != nil {
-			restService.WriteErrorResponse(w, err)
-			return
-		}
+		id := r.URL.Query().Get("id")
 
-		err := restService.bookService.Delete(req.ID)
+		err := restService.bookService.Delete(id)
 		if err != nil {
 			restService.WriteErrorResponse(w, err)
 			return

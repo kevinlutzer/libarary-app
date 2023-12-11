@@ -44,18 +44,6 @@ func (req *CollectionPostRequest) Validate() error {
 	return nil
 }
 
-type CollectionDeleteRequest struct {
-	ID string `json:"id"`
-}
-
-func (req *CollectionDeleteRequest) Validate() error {
-	if req.ID == "" {
-		return NewError(InvalidArguments, "id is required")
-	}
-
-	return nil
-}
-
 //
 // ApiCollection Definition
 //

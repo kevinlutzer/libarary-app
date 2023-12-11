@@ -127,20 +127,16 @@ func (restService *rest) CollectionHandler(w http.ResponseWriter, r *http.Reques
 	// Delete operation
 	//
 	if r.Method == http.MethodDelete {
-		req := shared.CollectionDeleteRequest{}
-		if err := json.Unmarshal([]byte(b), &req); err != nil {
-			err := shared.NewError(shared.InvalidArguments, err.Error())
+
+		if !r.URL.Query().Has("id") {
+			err := shared.NewError(shared.InvalidArguments, "id is required as a query param")
 			restService.WriteErrorResponse(w, err)
 			return
 		}
 
-		if err := req.Validate(); err != nil {
-			restService.WriteErrorResponse(w, err)
-			return
-		}
+		id := r.URL.Query().Get("id")
 
-		err := restService.collectionService.Delete(req.ID)
-		if err != nil {
+		if err := restService.collectionService.Delete(id); err != nil {
 			restService.WriteErrorResponse(w, err)
 			return
 		}

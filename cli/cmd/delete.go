@@ -4,6 +4,7 @@ import (
 	"errors"
 	shared "klutzer/conanical-library-app/shared"
 	"net/http"
+	"net/url"
 
 	"github.com/spf13/cobra"
 )
@@ -21,6 +22,11 @@ func (c *cmdDelete) Command() *cobra.Command {
 	cmd.Long = "Can delete either a singular book or a book collection."
 	cmd.RunE = c.Run
 
+	// Hostname
+	cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
+	cmd.Args = cobra.ExactArgs(2)
+
 	return cmd
 }
 
@@ -31,15 +37,12 @@ func (c *cmdDelete) Run(cmd *cobra.Command, args []string) error {
 type cmdDeleteBook struct {
 	httpClient *http.Client
 
-	host     *string
-	protocol *string
+	host *string
 }
 
-func NewCmdDeleteBook(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdDeleteBook(httpClient *http.Client) Cmd {
 	return &cmdDeleteBook{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -54,6 +57,9 @@ func (c *cmdDeleteBook) Command() *cobra.Command {
 	// The id arg is required
 	cmd.Args = cobra.ExactArgs(1)
 
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
 	return cmd
 }
 
@@ -63,12 +69,8 @@ func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
 		return errors.New(shared.InvalidIdMsg)
 	}
 
-	data := shared.CollectionDeleteRequest{
-		ID: id,
-	}
-
-	url := *c.protocol + "://" + *c.host + "/v1/book"
-	err := makeRequest[any](&data, nil, url, http.MethodDelete, c.httpClient)
+	url := "http://" + *c.host + "/v1/book?id=" + url.QueryEscape(id)
+	err := makeRequest[any](nil, nil, url, http.MethodDelete, c.httpClient)
 	if err != nil {
 		return err
 	}
@@ -84,16 +86,12 @@ func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
 
 type cmdDeleteCollection struct {
 	httpClient *http.Client
-
-	host     *string
-	protocol *string
+	host       *string
 }
 
-func NewCmdDeleteCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdDeleteCollection(httpClient *http.Client) Cmd {
 	return &cmdDeleteCollection{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -108,6 +106,9 @@ func (c *cmdDeleteCollection) Command() *cobra.Command {
 	// The id arg is required
 	cmd.Args = cobra.ExactArgs(1)
 
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
 	return cmd
 }
 
@@ -118,12 +119,8 @@ func (c *cmdDeleteCollection) Run(cmd *cobra.Command, args []string) error {
 		return errors.New(shared.InvalidIdMsg)
 	}
 
-	data := shared.CollectionDeleteRequest{
-		ID: id,
-	}
-
-	url := *c.protocol + "://" + *c.host + "/v1/collection"
-	if err := makeRequest[any](&data, nil, url, http.MethodDelete, c.httpClient); err != nil {
+	url := "http://" + *c.host + "/v1/collection?id=" + url.QueryEscape(id)
+	if err := makeRequest[any](nil, nil, url, http.MethodDelete, c.httpClient); err != nil {
 		return err
 	}
 

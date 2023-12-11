@@ -47,6 +47,7 @@ func (r *collectionRepo) Create(collection *model.Collection) error {
 func (s *collectionRepo) Update(id string, values map[string]interface{}) error {
 	tx := s.db.Table("collection").
 		Where("id = ?", id).
+		Where("deleted = ?", false).
 		Updates(values)
 
 	if tx.Error != nil {

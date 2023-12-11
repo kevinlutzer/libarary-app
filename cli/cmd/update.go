@@ -23,6 +23,11 @@ func (c *cmdUpdate) Command() *cobra.Command {
 	cmd.Long = "Can update either a book or a collection of books. Additional options can be specified to provide what fields to update with what values."
 	cmd.RunE = c.Run
 
+	// Hostname
+	cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
+	cmd.Args = cobra.ExactArgs(1)
+
 	return cmd
 }
 
@@ -34,11 +39,9 @@ func (c *cmdUpdate) Run(cmd *cobra.Command, args []string) error {
 // Update Book
 //
 
-func NewCmdUpdateBook(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdUpdateBook(httpClient *http.Client) Cmd {
 	return &cmdUpdateBook{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -51,8 +54,7 @@ type cmdUpdateBook struct {
 	genre       *string
 	edition     *uint8
 
-	host     *string
-	protocol *string
+	host *string
 }
 
 func (c *cmdUpdateBook) Command() *cobra.Command {
@@ -70,6 +72,9 @@ func (c *cmdUpdateBook) Command() *cobra.Command {
 	c.genre = cmd.Flags().String("genre", "", "The genre of the book, valid genres are: "+shared.ValidGenreStr+"")
 	c.edition = cmd.Flags().Uint8("edition", 0, "The edition of the book")
 
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
 	// Book specified [id]
 	cmd.Args = cobra.ExactArgs(1)
 
@@ -77,7 +82,7 @@ func (c *cmdUpdateBook) Command() *cobra.Command {
 }
 
 func (c *cmdUpdateBook) Run(cmd *cobra.Command, args []string) error {
-	url := *c.protocol + "://" + *c.host + "/v1/book"
+	url := "http://" + *c.host + "/v1/book"
 
 	data := &shared.BookData{}
 	fieldMask := []string{}
@@ -143,11 +148,9 @@ func (c *cmdUpdateBook) Run(cmd *cobra.Command, args []string) error {
 // Update Collection
 //
 
-func NewCmdUpdateCollection(httpClient *http.Client, host *string, protocol *string) Cmd {
+func NewCmdUpdateCollection(httpClient *http.Client) Cmd {
 	return &cmdUpdateCollection{
 		httpClient: httpClient,
-		host:       host,
-		protocol:   protocol,
 	}
 }
 
@@ -157,8 +160,7 @@ type cmdUpdateCollection struct {
 	name    *string
 	bookIDs *[]string
 
-	host     *string
-	protocol *string
+	host *string
 }
 
 func (c *cmdUpdateCollection) Command() *cobra.Command {
@@ -173,6 +175,9 @@ func (c *cmdUpdateCollection) Command() *cobra.Command {
 	c.name = cmd.Flags().String("name", "", "The name of the collection")
 	c.bookIDs = cmd.Flags().StringArray("bookid", []string{}, "The id of a book to add to the collection, this can be specified multiple times")
 
+	// Hostname
+	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
+
 	// Book specified [id]
 	cmd.Args = cobra.ExactArgs(1)
 
@@ -180,7 +185,7 @@ func (c *cmdUpdateCollection) Command() *cobra.Command {
 }
 
 func (c *cmdUpdateCollection) Run(cmd *cobra.Command, args []string) error {
-	url := *c.protocol + "://" + *c.host + "/v1/book"
+	url := "http://" + *c.host + "/v1/book"
 
 	data := &shared.CollectionData{}
 	fieldMask := []string{}

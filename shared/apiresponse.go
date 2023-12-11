@@ -4,7 +4,7 @@ type ApiResponseType string
 
 const (
 	Success ApiResponseType = "success"
-	Error   ApiResponseType = "error"
+	Error   ApiResponseType = "err"
 )
 
 type ApiResponse[D any] struct {

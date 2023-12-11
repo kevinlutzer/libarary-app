@@ -58,12 +58,12 @@ func (r *BookGetRequest) FromQueryStr(u url.Values) {
 
 	if ok := u.Has("rangeStart"); ok {
 		rangeStart, _ := url.QueryUnescape(u.Get("rangeStart"))
-		r.RangeStart, _ = time.Parse(time.RFC3339, rangeStart)
+		r.RangeStart, _ = time.Parse(time.DateOnly, rangeStart)
 	}
 
 	if ok := u.Has("rangeEnd"); ok {
 		rangeEnd, _ := url.QueryUnescape(u.Get("rangeEnd"))
-		r.RangeEnd, _ = time.Parse(time.RFC3339, rangeEnd)
+		r.RangeEnd, _ = time.Parse(time.DateOnly, rangeEnd)
 	}
 }
 
@@ -108,18 +108,6 @@ func (req *BookPostRequest) Validate() error {
 
 	if req.Data == nil {
 		req.Data = &BookData{}
-	}
-
-	return nil
-}
-
-type BookDeleteRequest struct {
-	ID string `json:"id"`
-}
-
-func (req *BookDeleteRequest) Validate() error {
-	if req.ID == "" {
-		return NewError(InvalidArguments, "id is required")
 	}
 
 	return nil
@@ -182,9 +170,10 @@ func (req *BookPutRequest) Validate() error {
 	return nil
 }
 
-// ApiBook represents the api definition of the book
 //
-// swagger:model
+// ApiBook Definition
+//
+
 type ApiBook struct {
 	ID          string    `json:"id"`
 	Title       string    `json:"title"`
@@ -195,16 +184,14 @@ type ApiBook struct {
 	Edition     uint8     `json:"edition"`
 }
 
-// BookPutResponse is the response from the PUT /v1/book API
 //
-// swagger:model
+// Responses
+//
+
 type BookPutResponse struct {
 	ID string `json:"id"`
 }
 
-// BookLoadResponse is the response from the GET /v1/book API
-//
-// swagger:model
-type BookLoadResponse = ApiResponse[struct {
+type BookLoadResponse struct {
 	Books []ApiBook `json:"books"`
-}]
+}
