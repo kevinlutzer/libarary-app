@@ -4,7 +4,7 @@ import (
 	"klutzer/conanical-library-app/server/internal/service"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -28,27 +28,20 @@ type rest struct {
 	logger            *zap.Logger
 	bookService       service.BookService
 	collectionService service.CollectionService
-	server            *http.Server
+	server            *gin.Engine
 }
 
-func NewREST(logger *zap.Logger, bookService service.BookService, collectionService service.CollectionService, port string) Rest {
-	mux := mux.NewRouter()
-
-	mux.StrictSlash(false)
-	mux.SkipClean(true)
+func NewREST(logger *zap.Logger, bookService service.BookService, collectionService service.CollectionService) Rest {
+	g := gin.Default()
 
 	restServer := &rest{
 		logger:            logger,
 		bookService:       bookService,
 		collectionService: collectionService,
-		server: &http.Server{
-			Addr:    ":" + port,
-			Handler: mux,
-		},
+		server:            g,
 	}
 
-	mux.HandleFunc(apiBook, restServer.BookHandler)
-	mux.HandleFunc(apiCollection, restServer.CollectionHandler)
+	g.Get(apiBook, restServer.GetBookHandler)
 
 	return restServer
 }

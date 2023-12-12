@@ -6,8 +6,40 @@ import (
 	shared "klutzer/conanical-library-app/shared"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"go.uber.org/zap"
 )
+
+func (restService *rest) GetBookHandler(r *gin.Context) {
+	req := shared.BookGetRequest{}
+	req.FromQueryStr(r.URL.Query())
+
+	// Log Request
+	restService.logger.Info("BookHandler", zap.String("method", r.Method), zap.String("path", r.URL.Path))
+
+	// Validate request
+	if err := req.Validate(); err != nil {
+		restService.WriteErrorResponse(w, err)
+		return
+	}
+
+	books, err := restService.bookService.Load(req.IDs, req.Author, shared.Genre(req.Genre), req.RangeStart, req.RangeEnd)
+	if err != nil {
+		restService.WriteErrorResponse(w, err)
+		return
+	}
+
+	apiBooks := make([]shared.ApiBook, len(books))
+	for i := range books {
+		apiBooks[i] = books[i].ToApi()
+	}
+
+	res := shared.BookLoadResponse{Books: apiBooks}
+	restService.WriteSuccessResponse(w, &res)
+
+	return
+}
 
 func (restService *rest) BookHandler(w http.ResponseWriter, r *http.Request) {
 

@@ -1,12 +1,10 @@
 package main
 
 import (
-	"errors"
 	"klutzer/conanical-library-app/server/internal/model"
 	"klutzer/conanical-library-app/server/internal/repo"
 	"klutzer/conanical-library-app/server/internal/rest"
 	"klutzer/conanical-library-app/server/internal/service"
-	"net/http"
 	"os"
 
 	"go.uber.org/zap"
@@ -67,15 +65,8 @@ func main() {
 	}
 
 	r := rest.NewREST(logger, bookService, collectionService, port)
-
-	logger.Info("Starting server")
-	if err := r.ListenAndServe(); err != nil {
-		if errors.Is(err, http.ErrServerClosed) {
-			logger.Fatal("Server closed", zap.Error(err))
-			os.Exit(ErrServerClosed)
-		}
-
-		logger.Fatal("Server errored", zap.Error(err))
-		os.Exit(ErrServerErrored)
+	if err := r.Run(":" + port); err != nil {
+		logger.Fatal("Server closed", zap.Error(err))
+		os.Exit(ErrServerClosed)
 	}
 }
