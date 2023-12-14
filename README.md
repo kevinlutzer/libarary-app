@@ -20,7 +20,13 @@ The server has the option to supply a port number to listen on as well as a plac
 PORT=8000 GIN_MODE=release DB_FILE=/tmp/libraryapp/gorm.db go run server/main.go
 ```
 
-To access the API documentation for the server, navigate to `http://localhost:8080/swagger/index.html` in your browser
+## API Docs
+
+API documentation is generated with `swaggo` and hosted with the REST API. They can be accessed by running the server an  navigating to `http://localhost:8080/swagger/index.html` in your browser. To regenerate the documentation run `swag init -g server/main.go` from the base of the project.
+
+## Setup Mock Data
+
+To add some data to the library application, run the `setupdata.sh` bash script in the `scripts/` folder.
 
 ## CLI
 
