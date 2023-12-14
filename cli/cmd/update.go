@@ -187,7 +187,7 @@ func (c *cmdUpdateCollection) Command() *cobra.Command {
 }
 
 func (c *cmdUpdateCollection) Run(cmd *cobra.Command, args []string) error {
-	url := *c.protocal + *c.host + "/v1/book"
+	url := *c.protocal + *c.host + "/v1/collection"
 
 	data := &shared.CollectionData{}
 	fieldMask := []string{}

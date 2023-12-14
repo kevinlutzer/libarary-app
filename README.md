@@ -32,7 +32,10 @@ To add some data to the library application, run the `setupdata.sh` bash script 
 
 To run the cli tool, execute: 
 
-`go run cli/main.go [command]`
+``` bash 
+cd cli
+go run main.go [command]
+```
 
 ## Additional Documents
 

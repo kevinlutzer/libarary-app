@@ -110,7 +110,6 @@ func (c *cmdGetBook) Run(cmd *cobra.Command, args []string) error {
 	resp := shared.ApiResponse[shared.BookGetResponseData]{}
 
 	u := *c.protocal + *c.host + "/v1/book?" + data.ToQueryStr()
-
 	cmd.Println(u)
 	err := makeRequest[shared.ApiResponse[shared.BookGetResponseData]](nil, &resp, u, http.MethodGet, c.httpClient)
 	if err != nil {
@@ -127,7 +126,7 @@ func (c *cmdGetBook) Run(cmd *cobra.Command, args []string) error {
 				cmd.Printf(", Published: %s", book.PublishedAt.Format(time.RFC3339))
 			}
 
-			cmd.Println("\n")
+			cmd.Printf("\n\n")
 		}
 	} else {
 		cmd.Printf("No books found matching the query\n")
