@@ -1,9 +1,9 @@
 package service
 
 import (
-	"klutzer/conanical-library-app/server/internal/model"
-	"klutzer/conanical-library-app/server/internal/repo"
-	"klutzer/conanical-library-app/shared"
+	"klutzer/library-app/server/internal/model"
+	"klutzer/library-app/server/internal/repo"
+	"klutzer/library-app/shared"
 	"time"
 
 	"github.com/google/uuid"

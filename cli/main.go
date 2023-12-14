@@ -1,7 +1,7 @@
 package main
 
 import (
-	"klutzer/conanical-library-app/cli/cmd"
+	"klutzer/library-app/cli/cmd"
 	"net/http"
 
 	"github.com/spf13/cobra"

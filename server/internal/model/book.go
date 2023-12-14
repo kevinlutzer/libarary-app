@@ -1,7 +1,7 @@
 package model
 
 import (
-	"klutzer/conanical-library-app/shared"
+	"klutzer/library-app/shared"
 	"time"
 
 	"gorm.io/gorm"

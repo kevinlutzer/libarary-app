@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"klutzer/conanical-library-app/shared"
+	"klutzer/library-app/shared"
 	"net/http"
 	"time"
 

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"klutzer/conanical-library-app/shared"
+	"klutzer/library-app/shared"
 	"net/http"
 	"time"
 

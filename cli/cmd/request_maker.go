@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"klutzer/conanical-library-app/shared"
+	"klutzer/library-app/shared"
 	"net/http"
 )
 

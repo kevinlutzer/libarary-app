@@ -1,32 +1,22 @@
 package main
 
 import (
-	"klutzer/conanical-library-app/server/internal/model"
-	"klutzer/conanical-library-app/server/internal/repo"
-	"klutzer/conanical-library-app/server/internal/rest"
-	"klutzer/conanical-library-app/server/internal/service"
+	"fmt"
+	"klutzer/library-app/server/internal/model"
+	"klutzer/library-app/server/internal/repo"
+	"klutzer/library-app/server/internal/rest"
+	"klutzer/library-app/server/internal/service"
 	"os"
-
-	"go.uber.org/zap"
 )
 
 const (
-	ErrDBInitFailed  = 4
-	ErrFailedZap     = 5
-	ErrServerClosed  = 6
-	ErrServerErrored = 7
+	ErrDBInitFailed = 4
+	ErrServerClosed = 6
 )
 
 func main() {
 
-	// Initialize logger with the Development configuration. This formats the logs to be easily read on Stdout.
-	// NewProduction() formats the logs by default in a json format meant for log aggregators
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		os.Exit(ErrFailedZap)
-	}
-
-	logger.Info("Initializing db")
+	fmt.Println("Initializing db")
 
 	//
 	// Initialize db
@@ -39,7 +29,7 @@ func main() {
 
 	db, err := repo.NewDB(dbFile)
 	if err != nil {
-		logger.Error("Failed to initialize db ", zap.Error(err))
+		os.Exit(ErrDBInitFailed)
 	}
 
 	//
@@ -64,9 +54,9 @@ func main() {
 		port = "8080"
 	}
 
-	r := rest.NewREST(logger, bookService, collectionService, port)
+	fmt.Println("Initializing server")
+	r := rest.NewREST(bookService, collectionService)
 	if err := r.Run(":" + port); err != nil {
-		logger.Fatal("Server closed", zap.Error(err))
 		os.Exit(ErrServerClosed)
 	}
 }

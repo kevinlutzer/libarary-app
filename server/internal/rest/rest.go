@@ -1,11 +1,9 @@
 package rest
 
 import (
-	"klutzer/conanical-library-app/server/internal/service"
-	"net/http"
+	"klutzer/library-app/server/internal/service"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 const (
@@ -18,38 +16,41 @@ var apis = []string{
 }
 
 type Rest interface {
-	Close() error
-	ListenAndServe() error
-	BookHandler(w http.ResponseWriter, r *http.Request)
-	CollectionHandler(w http.ResponseWriter, r *http.Request)
+	Run(port string) error
 }
 
 type rest struct {
-	logger            *zap.Logger
 	bookService       service.BookService
 	collectionService service.CollectionService
 	server            *gin.Engine
 }
 
-func NewREST(logger *zap.Logger, bookService service.BookService, collectionService service.CollectionService) Rest {
+func NewREST(bookService service.BookService, collectionService service.CollectionService) Rest {
 	g := gin.Default()
 
 	restServer := &rest{
-		logger:            logger,
 		bookService:       bookService,
 		collectionService: collectionService,
 		server:            g,
 	}
 
-	g.Get(apiBook, restServer.GetBookHandler)
+	g.SetTrustedProxies(nil)
+
+	// Book APIs
+	g.GET(apiBook, restServer.GetBookHandler)
+	g.PUT(apiBook, restServer.CreateBookHandler)
+	g.POST(apiBook, restServer.UpdateBookHandler)
+	g.DELETE(apiBook, restServer.DeleteBookHandler)
+
+	// Collection APIs
+	g.GET(apiCollection, restServer.GetCollectionHandler)
+	g.PUT(apiCollection, restServer.CreateCollectionHandler)
+	g.POST(apiCollection, restServer.UpdateCollectionHandler)
+	g.DELETE(apiCollection, restServer.DeleteCollectionHandler)
 
 	return restServer
 }
 
-func (restServer *rest) ListenAndServe() error {
-	return restServer.server.ListenAndServe()
-}
-
-func (restServer *rest) Close() error {
-	return restServer.server.Close()
+func (restServer *rest) Run(port string) error {
+	return restServer.server.Run(port)
 }

@@ -1,8 +1,8 @@
 package repo
 
 import (
-	"klutzer/conanical-library-app/server/internal/model"
-	"klutzer/conanical-library-app/shared"
+	"klutzer/library-app/server/internal/model"
+	"klutzer/library-app/shared"
 
 	"gorm.io/gorm"
 )

@@ -1,12 +1,15 @@
 package rest
 
 import (
-	"encoding/json"
-	shared "klutzer/conanical-library-app/shared"
+	shared "klutzer/library-app/shared"
 	"net/http"
 
-	"go.uber.org/zap"
+	"github.com/gin-gonic/gin"
 )
+
+//
+// Local Error to HTTP Error Conversion
+//
 
 var appErrorToHttpErrorMap = map[shared.ErrorType]int{
 	shared.AlreadyExists:      http.StatusBadRequest,
@@ -22,30 +25,25 @@ var defautError = shared.AppError{
 	Msg:  "Internal error",
 }
 
-func (restService *rest) WriteErrorResponse(w http.ResponseWriter, err error) {
-	w.Header().Set("Content-Type", "application/json")
+func (restService *rest) WriteErrorResponse(w *gin.Context, err error) {
+
 	res := shared.ApiResponse[shared.AppError]{
 		Type: "err",
 	}
 
+	code := http.StatusInternalServerError
 	if val, ok := err.(*shared.AppError); ok {
 		e, _ := appErrorToHttpErrorMap[err.(*shared.AppError).Type]
-		w.WriteHeader(e)
+		code = e
 		res.Data = *val
 	} else {
 		res.Data = defautError
-		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	b, _ := json.Marshal(res)
-	w.Write(b)
-
-	restService.logger.Error("Error response", zap.String("body", string(b)))
-	return
+	w.JSON(code, res)
 }
 
-func (restService *rest) WriteSuccessResponse(w http.ResponseWriter, data any) {
-	w.Header().Set("Content-Type", "application/json")
+func (restService *rest) WriteSuccessResponse(w *gin.Context, data any) {
 	res := shared.ApiResponse[any]{
 		Type: "success",
 	}
@@ -54,15 +52,5 @@ func (restService *rest) WriteSuccessResponse(w http.ResponseWriter, data any) {
 		res.Data = data
 	}
 
-	b, err := json.Marshal(res)
-	if err != nil {
-		restService.logger.Error("Failed to create api response", zap.Error(err))
-		err := shared.NewError(shared.Internal, "Failed to create api response")
-		restService.WriteErrorResponse(w, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
-	restService.logger.Info("Success response", zap.String("body", string(b)))
+	w.JSON(http.StatusOK, res)
 }

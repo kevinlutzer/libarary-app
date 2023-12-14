@@ -22,5 +22,6 @@ vendor/
 go.work
 
 .vscode/
+*.code-workspace
 
 server/gorm.db
