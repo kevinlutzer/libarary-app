@@ -1,5 +1,9 @@
 package shared
 
+type ApiRequest interface {
+	Validate() error
+}
+
 type ApiResponseType string
 
 const (

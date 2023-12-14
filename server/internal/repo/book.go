@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"fmt"
 	"klutzer/library-app/server/internal/model"
 	"klutzer/library-app/shared"
 	"time"
@@ -43,6 +44,7 @@ func (r *bookRepo) Load(ids []string, author string, genre shared.Genre, rangeSt
 	if !rangeStart.IsZero() && !rangeEnd.IsZero() {
 		tx = tx.Where("published_at between ? and ?", rangeStart, rangeEnd)
 	} else if !rangeStart.IsZero() {
+		fmt.Println("ASDASD")
 		tx = tx.Where("published_at >= ?", rangeStart)
 	} else if !rangeEnd.IsZero() {
 		tx = tx.Where("published_at <= ?", rangeEnd)

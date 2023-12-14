@@ -1,0 +1,390 @@
+basePath: /api/v1
+definitions:
+  shared.ApiBook:
+    properties:
+      author:
+        type: string
+      description:
+        type: string
+      edition:
+        type: integer
+      genre:
+        $ref: '#/definitions/shared.Genre'
+      id:
+        type: string
+      publishedAt:
+        type: string
+      title:
+        type: string
+    required:
+    - author
+    - description
+    - edition
+    - genre
+    - id
+    - publishedAt
+    - title
+    type: object
+  shared.ApiCollection:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/shared.ApiBook'
+        type: array
+      id:
+        type: string
+      title:
+        type: string
+    required:
+    - id
+    - title
+    type: object
+  shared.ApiResponseType:
+    enum:
+    - success
+    - err
+    type: string
+    x-enum-varnames:
+    - Success
+    - Error
+  shared.BookCreateRequest:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/shared.BookData'
+        description: optional
+      id:
+        description: optional
+        type: string
+      title:
+        description: required
+        type: string
+    required:
+    - title
+    type: object
+  shared.BookCreateResponse:
+    properties:
+      result:
+        $ref: '#/definitions/shared.BookCreateResponseData'
+      type:
+        $ref: '#/definitions/shared.ApiResponseType'
+    type: object
+  shared.BookCreateResponseData:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  shared.BookData:
+    properties:
+      author:
+        type: string
+      description:
+        type: string
+      edition:
+        type: integer
+      genre:
+        type: string
+      publishedAt:
+        type: string
+    type: object
+  shared.BookGetResponse:
+    properties:
+      result:
+        $ref: '#/definitions/shared.BookCreateResponseData'
+      type:
+        $ref: '#/definitions/shared.ApiResponseType'
+    type: object
+  shared.BookUpdateRequest:
+    properties:
+      data:
+        $ref: '#/definitions/shared.BookData'
+      fieldMask:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  shared.CollectionCreateRequest:
+    properties:
+      bookIDs:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  shared.CollectionCreateResponse:
+    properties:
+      result:
+        $ref: '#/definitions/shared.CollectionCreateResponseData'
+      type:
+        $ref: '#/definitions/shared.ApiResponseType'
+    type: object
+  shared.CollectionCreateResponseData:
+    properties:
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  shared.CollectionData:
+    properties:
+      bookIDs:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+    type: object
+  shared.CollectionGetResponse:
+    properties:
+      result:
+        $ref: '#/definitions/shared.CollectionGetResponseData'
+      type:
+        $ref: '#/definitions/shared.ApiResponseType'
+    type: object
+  shared.CollectionGetResponseData:
+    properties:
+      collections:
+        items:
+          $ref: '#/definitions/shared.ApiCollection'
+        type: array
+    required:
+    - collections
+    type: object
+  shared.CollectionUpdateRequest:
+    properties:
+      data:
+        $ref: '#/definitions/shared.CollectionData'
+      fieldMask:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+    required:
+    - id
+    type: object
+  shared.Genre:
+    enum:
+    - science
+    - history
+    - philosophy
+    - art
+    - cooking
+    - fantasy
+    - tragedy
+    type: string
+    x-enum-varnames:
+    - Science
+    - History
+    - Philosophy
+    - Art
+    - Cooking
+    - Fantasy
+    - Tragedy
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: kevinlutzer@proton.me
+    name: Kevin Lutzer
+  description: This is a sample server celler server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Library App API
+  version: "1.0"
+paths:
+  /book:
+    delete:
+      description: Deletes a book with the specified id, a deleted book will not be
+        able to be updated, deleted or surfaced in GET /v1/book and GET /v1/collection
+        APIs.
+      parameters:
+      - description: the id of the book to delete
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete a Book
+      tags:
+      - book
+    get:
+      description: Loads a list of books based on the specified filters in the query
+        string
+      parameters:
+      - collectionFormat: csv
+        description: a list of ids of books
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - description: the author of the books
+        in: query
+        name: author
+        type: string
+      - description: the genre of the books
+        enum:
+        - science
+        - history
+        - philosophy
+        - art
+        - cooking
+        - fantasy
+        - tragedy
+        in: query
+        name: genre
+        type: string
+      - description: the start of the range of published dates must be specified in
+          the form of 2006-01-02
+        in: query
+        name: rangeStart
+        type: string
+      - description: the end of the range of published dates must be specified in
+          the form of 2006-01-02
+        in: query
+        name: rangeEnd
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared.BookGetResponse'
+      summary: Get Books
+      tags:
+      - book
+    post:
+      consumes:
+      - application/json
+      description: Updates a book with the specified id in the request body. Fields
+        can be additionally updated based on if they appear in the field mask.
+      parameters:
+      - description: form data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/shared.BookUpdateRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update a Book
+      tags:
+      - book
+    put:
+      consumes:
+      - application/json
+      description: Creates a book based on the specified data in the request body
+      parameters:
+      - description: form data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/shared.BookCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared.BookCreateResponse'
+      summary: Create a Book
+      tags:
+      - book
+  /collection:
+    delete:
+      description: Deletes a collection with the specified id, a collection will not
+        be able to be updated, deleted or surfaced in GET /v1/collection API.
+      parameters:
+      - description: the id of the collection to delete
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete a Collection
+      tags:
+      - collection
+    get:
+      description: Loads all collections that are stored
+      parameters:
+      - description: include the books nested as each collection, this option will
+          increase the time the API takes to execute
+        in: query
+        name: includebooks
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared.CollectionGetResponse'
+      summary: Get Collections
+      tags:
+      - collection
+    post:
+      consumes:
+      - application/json
+      description: Updates a collection with the specified id in the request body.
+        Fields can be additionally updated based on if they appear in the field mask.
+      parameters:
+      - description: form data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/shared.CollectionUpdateRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update a Collection
+      tags:
+      - collection
+    put:
+      consumes:
+      - application/json
+      description: Creates a collection based on the specified data in the request
+        body
+      parameters:
+      - description: form data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/shared.CollectionCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shared.CollectionCreateResponse'
+      summary: Create a Collection
+      tags:
+      - collection
+swagger: "2.0"

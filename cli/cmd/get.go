@@ -105,12 +105,12 @@ func (c *cmdGetBook) Run(cmd *cobra.Command, args []string) error {
 		data.RangeEnd = t
 	}
 
-	resp := shared.ApiResponse[shared.BookLoadResponse]{}
+	resp := shared.ApiResponse[shared.BookGetResponseData]{}
 
 	u := "http://" + *c.host + "/v1/book?" + data.ToQueryStr()
 
 	cmd.Println(u)
-	err := makeRequest[shared.ApiResponse[shared.BookLoadResponse]](nil, &resp, u, http.MethodGet, c.httpClient)
+	err := makeRequest[shared.ApiResponse[shared.BookGetResponseData]](nil, &resp, u, http.MethodGet, c.httpClient)
 	if err != nil {
 		return err
 	}
@@ -172,14 +172,14 @@ func (c *cmdGetCollection) Command() *cobra.Command {
 
 func (c *cmdGetCollection) Run(cmd *cobra.Command, args []string) error {
 
-	resp := shared.ApiResponse[shared.CollectionLoadResponse]{}
+	resp := shared.ApiResponse[shared.CollectionGetResponseData]{}
 
 	u := "http://" + *c.host + "/v1/collection"
 	if *c.includeBooks {
 		u += "?includebooks=true"
 	}
 
-	if err := makeRequest[shared.ApiResponse[shared.CollectionLoadResponse]](nil, &resp, u, http.MethodGet, c.httpClient); err != nil {
+	if err := makeRequest[shared.ApiResponse[shared.CollectionGetResponseData]](nil, &resp, u, http.MethodGet, c.httpClient); err != nil {
 		return err
 	}
 

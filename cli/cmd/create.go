@@ -91,7 +91,7 @@ func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	data := shared.BookPutRequest{
+	data := shared.BookCreateRequest{
 		Title: args[0],
 		ID:    *c.id,
 		Data: &shared.BookData{
@@ -103,8 +103,8 @@ func (c *cmdCreateBook) Run(cmd *cobra.Command, args []string) error {
 		},
 	}
 
-	res := shared.ApiResponse[shared.BookPutResponse]{}
-	if err := makeRequest[shared.ApiResponse[shared.BookPutResponse]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {
+	res := shared.ApiResponse[shared.BookCreateResponseData]{}
+	if err := makeRequest[shared.ApiResponse[shared.BookCreateResponseData]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {
 		return err
 	}
 
@@ -152,7 +152,7 @@ func (c *cmdCreateCollection) Command() *cobra.Command {
 }
 
 func (c *cmdCreateCollection) Run(cmd *cobra.Command, args []string) error {
-	data := shared.CollectionPutRequest{
+	data := shared.CollectionCreateRequest{
 		Name:    args[0],
 		BookIDs: *c.bookIDs,
 	}
@@ -163,8 +163,8 @@ func (c *cmdCreateCollection) Run(cmd *cobra.Command, args []string) error {
 
 	url := "http://" + *c.host + "/v1/collection"
 
-	res := shared.ApiResponse[shared.CollectionPutResponse]{}
-	if err := makeRequest[shared.ApiResponse[shared.CollectionPutResponse]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {
+	res := shared.ApiResponse[shared.CollectionCreateResponseData]{}
+	if err := makeRequest[shared.ApiResponse[shared.CollectionCreateResponseData]](&data, &res, url, http.MethodPut, c.httpClient); err != nil {
 		return err
 	}
 

@@ -14,10 +14,6 @@ const (
 	apiCollection = "/v1/collection"
 )
 
-var apis = []string{
-	apiBook, apiCollection,
-}
-
 type Rest interface {
 	Run(port string) error
 }

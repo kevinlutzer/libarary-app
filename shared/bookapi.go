@@ -95,13 +95,13 @@ func (req *BookGetRequest) Validate() error {
 	return nil
 }
 
-type BookPostRequest struct {
-	ID        string    `json:"id"`
+type BookUpdateRequest struct {
+	ID        string    `json:"id" binding:"required"`
 	Data      *BookData `json:"data"`
 	FieldMask []string  `json:"fieldMask"`
 }
 
-func (req *BookPostRequest) Validate() error {
+func (req *BookUpdateRequest) Validate() error {
 	if req.ID == "" {
 		return NewError(InvalidArguments, "id is required")
 	}
@@ -146,13 +146,13 @@ func (req *BookData) Validate() error {
 	return nil
 }
 
-type BookPutRequest struct {
-	ID    string    `json:"id"`    // optional
-	Data  *BookData `json:"data"`  // optional
-	Title string    `json:"title"` // required
+type BookCreateRequest struct {
+	ID    string    `json:"id"`                       // optional
+	Data  *BookData `json:"data"`                     // optional
+	Title string    `json:"title" binding:"required"` // required
 }
 
-func (req *BookPutRequest) Validate() error {
+func (req *BookCreateRequest) Validate() error {
 	if req.Title == "" || len(req.Title) > 512 {
 		return NewError(InvalidArguments, "title is required and must be less than 512 characters")
 	}
@@ -175,23 +175,27 @@ func (req *BookPutRequest) Validate() error {
 //
 
 type ApiBook struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Author      string    `json:"author"`
-	Description string    `json:"description"`
-	PublishedAt time.Time `json:"publishedAt"`
-	Genre       Genre     `json:"genre"`
-	Edition     uint8     `json:"edition"`
+	ID          string    `json:"id" binding:"required"`
+	Title       string    `json:"title" binding:"required"`
+	Author      string    `json:"author" binding:"required"`
+	Description string    `json:"description" binding:"required"`
+	PublishedAt time.Time `json:"publishedAt" binding:"required"`
+	Genre       Genre     `json:"genre" binding:"required"`
+	Edition     uint8     `json:"edition" binding:"required"`
 }
 
 //
 // Responses
 //
 
-type BookPutResponse struct {
-	ID string `json:"id"`
+type BookCreateResponseData struct {
+	ID string `json:"id" binding:"required"`
 }
 
-type BookLoadResponse struct {
-	Books []ApiBook `json:"books"`
+type BookCreateResponse = ApiResponse[BookCreateResponseData]
+
+type BookGetResponseData struct {
+	Books []ApiBook `json:"books" binding:"required"`
 }
+
+type BookGetResponse = ApiResponse[BookGetResponseData]

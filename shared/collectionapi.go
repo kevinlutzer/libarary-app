@@ -1,11 +1,11 @@
 package shared
 
-type CollectionPutRequest struct {
-	Name    string   `json:"name"`
+type CollectionCreateRequest struct {
+	Name    string   `json:"name" binding:"required"`
 	BookIDs []string `json:"bookIDs"`
 }
 
-func (req *CollectionPutRequest) Validate() error {
+func (req *CollectionCreateRequest) Validate() error {
 	if req.Name == "" || len(req.Name) > 512 {
 		return NewError(InvalidArguments, "name is required and must be less than 512 characters")
 	}
@@ -22,17 +22,17 @@ func (req *CollectionPutRequest) Validate() error {
 }
 
 type CollectionData struct {
-	Name    string   `json:"name"`
-	BookIDs []string `json:"books"`
+	Name    string   `json:"name" `
+	BookIDs []string `json:"bookIDs"`
 }
 
-type CollectionPostRequest struct {
-	ID        string          `json:"id"`
+type CollectionUpdateRequest struct {
+	ID        string          `json:"id" binding:"required"`
 	Data      *CollectionData `json:"data"`
 	FieldMask []string        `json:"fieldMask"`
 }
 
-func (req *CollectionPostRequest) Validate() error {
+func (req *CollectionUpdateRequest) Validate() error {
 	if req.ID == "" {
 		return NewError(InvalidArguments, "id is required")
 	}
@@ -49,8 +49,8 @@ func (req *CollectionPostRequest) Validate() error {
 //
 
 type ApiCollection struct {
-	ID    string    `json:"id"`
-	Name  string    `json:"title"`
+	ID    string    `json:"id" binding:"required"`
+	Name  string    `json:"title" binding:"required"`
 	Books []ApiBook `json:"books"`
 }
 
@@ -58,10 +58,16 @@ type ApiCollection struct {
 // Responses
 //
 
-type CollectionPutResponse struct {
-	ID string `json:"id"`
+type CollectionCreateResponseData struct {
+	ID string `json:"id" binding:"required"`
 }
 
-type CollectionLoadResponse struct {
-	Collections []ApiCollection `json:"collections"`
+// Swag definition
+type CollectionCreateResponse = ApiResponse[CollectionCreateResponseData]
+
+type CollectionGetResponseData struct {
+	Collections []ApiCollection `json:"collections" binding:"required"`
 }
+
+// Swag definition
+type CollectionGetResponse = ApiResponse[CollectionGetResponseData]

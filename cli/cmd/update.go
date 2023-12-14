@@ -129,7 +129,7 @@ func (c *cmdUpdateBook) Run(cmd *cobra.Command, args []string) error {
 		return errors.New(shared.InvalidIdMsg)
 	}
 
-	req := shared.BookPostRequest{
+	req := shared.BookUpdateRequest{
 		ID:        id,
 		Data:      data,
 		FieldMask: fieldMask,
@@ -207,7 +207,7 @@ func (c *cmdUpdateCollection) Run(cmd *cobra.Command, args []string) error {
 		return errors.New(shared.InvalidIdMsg)
 	}
 
-	req := shared.CollectionPostRequest{
+	req := shared.CollectionUpdateRequest{
 		ID:        id,
 		Data:      data,
 		FieldMask: fieldMask,

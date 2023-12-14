@@ -9,6 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @BasePath /v1
+// @Summary Get Collections
+// @Param        includebooks    query     bool  false  "include the books nested as each collection, this option will increase the time the API takes to execute"
+// @Description Loads all collections that are stored
+// @Tags collection
+// @Produce json
+// @Success 200 {object} shared.CollectionGetResponse
+// @Router /collection [get]
 func (restService *rest) GetCollectionHandler(c *gin.Context) {
 	var includeBooks bool
 	q := c.Request.URL.Query()
@@ -38,10 +46,19 @@ func (restService *rest) GetCollectionHandler(c *gin.Context) {
 		apiCollection[i] = collections[i].ToApi(books)
 	}
 
-	res := shared.CollectionLoadResponse{Collections: apiCollection}
+	res := shared.CollectionGetResponseData{Collections: apiCollection}
 	restService.WriteSuccessResponse(c, &res)
 }
 
+// @BasePath /v1
+// @Summary Create a Collection
+// @Param request body shared.CollectionCreateRequest true "form data"
+// @Description Creates a collection based on the specified data in the request body
+// @Tags collection
+// @Accept  json
+// @Produce json
+// @Success 200 {object} shared.CollectionCreateResponse
+// @Router /collection [put]
 func (restService *rest) CreateCollectionHandler(c *gin.Context) {
 	// Read request as bytes
 	b, err := io.ReadAll(c.Request.Body)
@@ -52,7 +69,7 @@ func (restService *rest) CreateCollectionHandler(c *gin.Context) {
 	}
 
 	// Unmarshal request
-	req := shared.CollectionPutRequest{}
+	req := shared.CollectionCreateRequest{}
 	if err := json.Unmarshal([]byte(b), &req); err != nil {
 		err := shared.NewError(shared.InvalidArguments, err.Error())
 		restService.WriteErrorResponse(c, err)
@@ -72,10 +89,18 @@ func (restService *rest) CreateCollectionHandler(c *gin.Context) {
 		return
 	}
 
-	res := shared.CollectionPutResponse{ID: id}
+	res := shared.CollectionCreateResponseData{ID: id}
 	restService.WriteSuccessResponse(c, &res)
 }
 
+// @BasePath /v1
+// @Summary Update a Collection
+// @Param request body shared.CollectionUpdateRequest true "form data"
+// @Description Updates a collection with the specified id in the request body. Fields can be additionally updated based on if they appear in the field mask.
+// @Tags collection
+// @Accept  json
+// @Produce json
+// @Router /collection [post]
 func (restService *rest) UpdateCollectionHandler(c *gin.Context) {
 	// Read request as bytes
 	b, err := io.ReadAll(c.Request.Body)
@@ -86,7 +111,7 @@ func (restService *rest) UpdateCollectionHandler(c *gin.Context) {
 	}
 
 	// Unmarshal request
-	req := shared.CollectionPostRequest{}
+	req := shared.CollectionUpdateRequest{}
 	if err := json.Unmarshal([]byte(b), &req); err != nil {
 		err := shared.NewError(shared.InvalidArguments, err.Error())
 		restService.WriteErrorResponse(c, err)
@@ -108,6 +133,14 @@ func (restService *rest) UpdateCollectionHandler(c *gin.Context) {
 	restService.WriteSuccessResponse(c, nil)
 }
 
+// @BasePath /v1
+// @Summary Delete a Collection
+// @Param        id    query     string  true  "the id of the collection to delete"
+// @Description Deletes a collection with the specified id, a collection will not be able to be updated, deleted or surfaced in GET /v1/collection API.
+// @Produce json
+// @Tags collection
+// @Success 200
+// @Router /collection [delete]
 func (restService *rest) DeleteCollectionHandler(c *gin.Context) {
 
 	// Validate request

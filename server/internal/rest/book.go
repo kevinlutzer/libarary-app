@@ -8,17 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @BasePath /api/v1
-
-// PingExample godoc
-// @Summary ping example
-// @Schemes
-// @Description do ping
-// @Tags example
-// @Accept json
+// @BasePath /v1
+// @Summary Get Books
+// @Param        ids    query     []string  false  "a list of ids of books"
+// @Param        author    query     string  false  "the author of the books"
+// @Param        genre    query     shared.Genre  false  "the genre of the books"
+// @Param        rangeStart    query     string  false  "the start of the range of published dates must be specified in the form of 2006-01-02"
+// @Param        rangeEnd    query     string  false  "the end of the range of published dates must be specified in the form of 2006-01-02"
+// @Description Loads a list of books based on the specified filters in the query string
+// @Tags book
 // @Produce json
-// @Success 200 {string} Helloworld
-// @Router /v1/book [get]
+// @Success 200 {object} shared.BookGetResponse
+// @Router /book [get]
 func (restService *rest) GetBookHandler(r *gin.Context) {
 	req := shared.BookGetRequest{}
 	req.FromQueryStr(r.Request.URL.Query())
@@ -40,12 +41,21 @@ func (restService *rest) GetBookHandler(r *gin.Context) {
 		apiBooks[i] = books[i].ToApi()
 	}
 
-	res := shared.BookLoadResponse{Books: apiBooks}
+	res := shared.BookGetResponseData{Books: apiBooks}
 	restService.WriteSuccessResponse(r, &res)
 
 	return
 }
 
+// @BasePath /v1
+// @Summary Create a Book
+// @Param request body shared.BookCreateRequest true "form data"
+// @Description Creates a book based on the specified data in the request body
+// @Tags book
+// @Accept  json
+// @Produce json
+// @Success 200 {object} shared.BookCreateResponse
+// @Router /book [put]
 func (restService *rest) CreateBookHandler(r *gin.Context) {
 	// Read request as bytes
 	b, err := io.ReadAll(r.Request.Body)
@@ -56,7 +66,7 @@ func (restService *rest) CreateBookHandler(r *gin.Context) {
 	}
 
 	// Create operation
-	req := shared.BookPutRequest{}
+	req := shared.BookCreateRequest{}
 	if err := json.Unmarshal([]byte(b), &req); err != nil {
 		err := shared.NewError(shared.InvalidArguments, err.Error())
 		restService.WriteErrorResponse(r, err)
@@ -75,10 +85,18 @@ func (restService *rest) CreateBookHandler(r *gin.Context) {
 		return
 	}
 
-	res := shared.BookPutResponse{ID: id}
+	res := shared.BookCreateResponseData{ID: id}
 	restService.WriteSuccessResponse(r, &res)
 }
 
+// @BasePath /v1
+// @Summary Update a Book
+// @Param request body shared.BookUpdateRequest true "form data"
+// @Description Updates a book with the specified id in the request body. Fields can be additionally updated based on if they appear in the field mask.
+// @Accept  json
+// @Tags book
+// @Produce json
+// @Router /book [post]
 func (restService *rest) UpdateBookHandler(r *gin.Context) {
 	// Read request as bytes
 	b, err := io.ReadAll(r.Request.Body)
@@ -89,7 +107,7 @@ func (restService *rest) UpdateBookHandler(r *gin.Context) {
 	}
 
 	// Post operation
-	req := shared.BookPostRequest{}
+	req := shared.BookUpdateRequest{}
 	if err := json.Unmarshal([]byte(b), &req); err != nil {
 		err := shared.NewError(shared.InvalidArguments, err.Error())
 		restService.WriteErrorResponse(r, err)
@@ -111,6 +129,14 @@ func (restService *rest) UpdateBookHandler(r *gin.Context) {
 	restService.WriteSuccessResponse(r, nil)
 }
 
+// @BasePath /v1
+// @Summary Delete a Book
+// @Param        id    query     string  true  "the id of the book to delete"
+// @Description Deletes a book with the specified id, a deleted book will not be able to be updated, deleted or surfaced in GET /v1/book and GET /v1/collection APIs.
+// @Produce json
+// @Success 200
+// @Tags book
+// @Router /book [delete]
 func (restService *rest) DeleteBookHandler(r *gin.Context) {
 
 	// Validate the request
