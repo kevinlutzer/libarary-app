@@ -68,6 +68,13 @@ func main() {
 	rootCmd.AddCommand(updateCmd)
 
 	//
+	// Docs
+	//
+
+	docsCmd := cmd.NewCmdDocs().Command()
+	rootCmd.AddCommand(docsCmd)
+
+	//
 	// Build the command structure
 	//
 

@@ -1,9 +1,12 @@
 package rest
 
 import (
+	"klutzer/library-app/docs"
 	"klutzer/library-app/server/internal/service"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 const (
@@ -35,6 +38,13 @@ func NewREST(bookService service.BookService, collectionService service.Collecti
 	}
 
 	g.SetTrustedProxies(nil)
+
+	// Not Found Handler
+	g.NoRoute(restServer.NotFoundHandler)
+
+	// Swagger APIs
+	docs.SwaggerInfo.BasePath = "/v1"
+	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// Book APIs
 	g.GET(apiBook, restServer.GetBookHandler)
