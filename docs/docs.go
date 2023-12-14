@@ -68,13 +68,13 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "the start of the range of published dates must be specified in the form of 2006-01-02",
-                        "name": "rangeStart",
+                        "name": "publishedStart",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "description": "the end of the range of published dates must be specified in the form of 2006-01-02",
-                        "name": "rangeEnd",
+                        "name": "publishedEnd",
                         "in": "query"
                     }
                 ],
@@ -417,10 +417,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "result": {
-                    "$ref": "#/definitions/shared.BookCreateResponseData"
+                    "$ref": "#/definitions/shared.BookGetResponseData"
                 },
                 "type": {
                     "$ref": "#/definitions/shared.ApiResponseType"
+                }
+            }
+        },
+        "shared.BookGetResponseData": {
+            "type": "object",
+            "required": [
+                "books"
+            ],
+            "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/shared.ApiBook"
+                    }
                 }
             }
         },

@@ -7,11 +7,11 @@ import (
 )
 
 type BookGetRequest struct {
-	IDs        []string  `json:"ids"`
-	Author     string    `json:"author"`
-	Genre      string    `json:"genre"`
-	RangeStart time.Time `json:"rangeStart"`
-	RangeEnd   time.Time `json:"rangeEnd"`
+	IDs            []string  `json:"ids"`
+	Author         string    `json:"author"`
+	Genre          string    `json:"genre"`
+	PublishedStart time.Time `json:"publishedStart"`
+	PublishedEnd   time.Time `json:"publishedEnd"`
 }
 
 func (r *BookGetRequest) ToQueryStr() string {
@@ -29,12 +29,12 @@ func (r *BookGetRequest) ToQueryStr() string {
 		q.Set("genre", url.QueryEscape(r.Genre))
 	}
 
-	if !r.RangeStart.IsZero() {
-		q.Set("rangeStart", url.QueryEscape(r.RangeStart.Format(time.RFC3339)))
+	if !r.PublishedStart.IsZero() {
+		q.Set("publishedStart", url.QueryEscape(r.PublishedStart.Format(time.RFC3339)))
 	}
 
-	if !r.RangeEnd.IsZero() {
-		q.Set("rangeEnd", url.QueryEscape(r.RangeEnd.Format(time.RFC3339)))
+	if !r.PublishedEnd.IsZero() {
+		q.Set("publishedEnd", url.QueryEscape(r.PublishedEnd.Format(time.RFC3339)))
 	}
 
 	return q.Encode()
@@ -56,14 +56,14 @@ func (r *BookGetRequest) FromQueryStr(u url.Values) {
 		r.Genre = genre
 	}
 
-	if ok := u.Has("rangeStart"); ok {
-		rangeStart, _ := url.QueryUnescape(u.Get("rangeStart"))
-		r.RangeStart, _ = time.Parse(time.DateOnly, rangeStart)
+	if ok := u.Has("publishedStart"); ok {
+		publishedStart, _ := url.QueryUnescape(u.Get("publishedStart"))
+		r.PublishedStart, _ = time.Parse(time.DateOnly, publishedStart)
 	}
 
-	if ok := u.Has("rangeEnd"); ok {
-		rangeEnd, _ := url.QueryUnescape(u.Get("rangeEnd"))
-		r.RangeEnd, _ = time.Parse(time.DateOnly, rangeEnd)
+	if ok := u.Has("publishedEnd"); ok {
+		publishedEnd, _ := url.QueryUnescape(u.Get("publishedEnd"))
+		r.PublishedEnd, _ = time.Parse(time.DateOnly, publishedEnd)
 	}
 }
 
@@ -84,11 +84,11 @@ func (req *BookGetRequest) Validate() error {
 		return NewError(InvalidArguments, "genre is not one of the valid genres: "+ValidGenreStr)
 	}
 
-	if !req.RangeStart.IsZero() && !req.RangeEnd.IsZero() && req.RangeStart.After(req.RangeEnd) {
+	if !req.PublishedStart.IsZero() && !req.PublishedEnd.IsZero() && req.PublishedStart.After(req.PublishedEnd) {
 		return NewError(InvalidArguments, "range start must be before range end")
 	}
 
-	if !req.RangeStart.IsZero() && req.RangeStart.After(time.Now()) {
+	if !req.PublishedStart.IsZero() && req.PublishedStart.After(time.Now()) {
 		return NewError(InvalidArguments, "range start must be before now")
 	}
 

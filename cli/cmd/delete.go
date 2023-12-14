@@ -37,7 +37,8 @@ func (c *cmdDelete) Run(cmd *cobra.Command, args []string) error {
 type cmdDeleteBook struct {
 	httpClient *http.Client
 
-	host *string
+	protocal *string
+	host     *string
 }
 
 func NewCmdDeleteBook(httpClient *http.Client) Cmd {
@@ -57,9 +58,9 @@ func (c *cmdDeleteBook) Command() *cobra.Command {
 	// The id arg is required
 	cmd.Args = cobra.ExactArgs(1)
 
-	// Hostname
+	// Hostname and Protocal
 	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
-
+	c.protocal = cmd.Flags().String("protocal", "http://", "The protocal to use when connecting to the server")
 	return cmd
 }
 
@@ -69,7 +70,7 @@ func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
 		return errors.New(shared.InvalidIdMsg)
 	}
 
-	url := "http://" + *c.host + "/v1/book?id=" + url.QueryEscape(id)
+	url := *c.protocal + *c.host + "/v1/book?id=" + url.QueryEscape(id)
 	err := makeRequest[any](nil, nil, url, http.MethodDelete, c.httpClient)
 	if err != nil {
 		return err
@@ -86,7 +87,9 @@ func (c *cmdDeleteBook) Run(cmd *cobra.Command, args []string) error {
 
 type cmdDeleteCollection struct {
 	httpClient *http.Client
-	host       *string
+
+	protocal *string
+	host     *string
 }
 
 func NewCmdDeleteCollection(httpClient *http.Client) Cmd {
@@ -106,9 +109,9 @@ func (c *cmdDeleteCollection) Command() *cobra.Command {
 	// The id arg is required
 	cmd.Args = cobra.ExactArgs(1)
 
-	// Hostname
+	// Hostname and Protocal
 	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
-
+	c.protocal = cmd.Flags().String("protocal", "http://", "The protocal to use when connecting to the server")
 	return cmd
 }
 
@@ -119,7 +122,7 @@ func (c *cmdDeleteCollection) Run(cmd *cobra.Command, args []string) error {
 		return errors.New(shared.InvalidIdMsg)
 	}
 
-	url := "http://" + *c.host + "/v1/collection?id=" + url.QueryEscape(id)
+	url := *c.protocal + *c.host + "/v1/collection?id=" + url.QueryEscape(id)
 	if err := makeRequest[any](nil, nil, url, http.MethodDelete, c.httpClient); err != nil {
 		return err
 	}

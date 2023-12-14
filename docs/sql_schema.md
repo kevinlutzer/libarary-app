@@ -1,11 +1,6 @@
-<!-- 
-This should include the documentation of the REST API, all supported methods and what they’ll
-be doing, examples of input and output data and what query parameters will be supported and
-what they’ll do. See for example the actual REST API documentation of LXD. -->
-
 IDs for both schemas are a UUID v4 string. I also created indices on the columns that will be filtered on within gorm.
 
-# Book Schema
+## Book Schema
 
 ``` sql
 CREATE TABLE `book` ( 
@@ -21,7 +16,7 @@ CREATE TABLE `book` (
 )
 ```
 
-# Collection Schema
+## Collection Schema
 
 Note that the book_ids column is a blob that stores a comma separated list of book IDs. It doesn't appear that SQLite supports text arrays.
 

@@ -14,7 +14,7 @@ type bookService struct {
 }
 
 type BookService interface {
-	Load(ids []string, author string, genre shared.Genre, rangeStart time.Time, rangeEnd time.Time) ([]model.Book, error)
+	Load(ids []string, author string, genre shared.Genre, publishedStart time.Time, publishedEnd time.Time) ([]model.Book, error)
 	Create(id string, title string, author string, description string, publishedAt time.Time, genre shared.Genre, edition uint8) (string, error)
 	Update(id string, author string, description string, publishedAt time.Time, genre shared.Genre, edition uint8, fieldMask []string) error
 	Delete(id string) error
@@ -24,8 +24,8 @@ func NewBookService(repo repo.BookRepository) BookService {
 	return &bookService{repo: repo}
 }
 
-func (s *bookService) Load(ids []string, author string, genre shared.Genre, rangeStart time.Time, rangeEnd time.Time) ([]model.Book, error) {
-	return s.repo.Load(ids, author, genre, rangeStart, rangeEnd)
+func (s *bookService) Load(ids []string, author string, genre shared.Genre, publishedStart time.Time, publishedEnd time.Time) ([]model.Book, error) {
+	return s.repo.Load(ids, author, genre, publishedStart, publishedEnd)
 }
 
 func (s *bookService) Create(id string, title string, author string, description string, publishedAt time.Time, genre shared.Genre, edition uint8) (string, error) {

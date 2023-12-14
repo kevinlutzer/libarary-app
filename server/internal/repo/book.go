@@ -17,7 +17,7 @@ type bookRepo struct {
 type BookRepository interface {
 	Create(book *model.Book) error
 	Update(id string, values map[string]interface{}) error
-	Load(ids []string, author string, genre shared.Genre, rangeStart time.Time, rangeEnd time.Time) ([]model.Book, error)
+	Load(ids []string, author string, genre shared.Genre, publishedStart time.Time, publishedEnd time.Time) ([]model.Book, error)
 	Get(id string) (model.Book, error)
 }
 
@@ -27,7 +27,8 @@ func NewBookRepo(db *gorm.DB) BookRepository {
 	}
 }
 
-func (r *bookRepo) Load(ids []string, author string, genre shared.Genre, rangeStart time.Time, rangeEnd time.Time) ([]model.Book, error) {
+func (r *bookRepo) Load(ids []string, author string, genre shared.Genre, publishedStart time.Time, publishedEnd time.Time) ([]model.Book, error) {
+
 	tx := r.db.Table("book").Where("deleted = ?", false)
 	if len(ids) > 0 {
 		tx = tx.Where("id in ?", ids)
@@ -41,13 +42,13 @@ func (r *bookRepo) Load(ids []string, author string, genre shared.Genre, rangeSt
 		tx = tx.Where("genre = ?", genre)
 	}
 
-	if !rangeStart.IsZero() && !rangeEnd.IsZero() {
-		tx = tx.Where("published_at between ? and ?", rangeStart, rangeEnd)
-	} else if !rangeStart.IsZero() {
+	if !publishedStart.IsZero() && !publishedEnd.IsZero() {
+		tx = tx.Where("published_at between ? and ?", publishedStart, publishedEnd)
+	} else if !publishedStart.IsZero() {
 		fmt.Println("ASDASD")
-		tx = tx.Where("published_at >= ?", rangeStart)
-	} else if !rangeEnd.IsZero() {
-		tx = tx.Where("published_at <= ?", rangeEnd)
+		tx = tx.Where("published_at >= ?", publishedStart)
+	} else if !publishedEnd.IsZero() {
+		tx = tx.Where("published_at <= ?", publishedEnd)
 	}
 
 	var books []model.Book

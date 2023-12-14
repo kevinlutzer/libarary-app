@@ -13,8 +13,8 @@ import (
 // @Param        ids    query     []string  false  "a list of ids of books"
 // @Param        author    query     string  false  "the author of the books"
 // @Param        genre    query     shared.Genre  false  "the genre of the books"
-// @Param        rangeStart    query     string  false  "the start of the range of published dates must be specified in the form of 2006-01-02"
-// @Param        rangeEnd    query     string  false  "the end of the range of published dates must be specified in the form of 2006-01-02"
+// @Param        publishedStart    query     string  false  "the start of the range of published dates must be specified in the form of 2006-01-02"
+// @Param        publishedEnd    query     string  false  "the end of the range of published dates must be specified in the form of 2006-01-02"
 // @Description Loads a list of books based on the specified filters in the query string
 // @Tags book
 // @Produce json
@@ -30,7 +30,7 @@ func (restService *rest) GetBookHandler(r *gin.Context) {
 		return
 	}
 
-	books, err := restService.bookService.Load(req.IDs, req.Author, shared.Genre(req.Genre), req.RangeStart, req.RangeEnd)
+	books, err := restService.bookService.Load(req.IDs, req.Author, shared.Genre(req.Genre), req.PublishedStart, req.PublishedEnd)
 	if err != nil {
 		restService.WriteErrorResponse(r, err)
 		return

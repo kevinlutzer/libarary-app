@@ -92,9 +92,18 @@ definitions:
   shared.BookGetResponse:
     properties:
       result:
-        $ref: '#/definitions/shared.BookCreateResponseData'
+        $ref: '#/definitions/shared.BookGetResponseData'
       type:
         $ref: '#/definitions/shared.ApiResponseType'
+    type: object
+  shared.BookGetResponseData:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/shared.ApiBook'
+        type: array
+    required:
+    - books
     type: object
   shared.BookUpdateRequest:
     properties:
@@ -255,12 +264,12 @@ paths:
       - description: the start of the range of published dates must be specified in
           the form of 2006-01-02
         in: query
-        name: rangeStart
+        name: publishedStart
         type: string
       - description: the end of the range of published dates must be specified in
           the form of 2006-01-02
         in: query
-        name: rangeEnd
+        name: publishedEnd
         type: string
       produces:
       - application/json

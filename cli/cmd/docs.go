@@ -8,7 +8,8 @@ import (
 )
 
 type cmdDocs struct {
-	host *string
+	protocal *string
+	host     *string
 }
 
 func NewCmdDocs() Cmd {
@@ -22,16 +23,16 @@ func (c *cmdDocs) Command() *cobra.Command {
 	cmd.Long = "Opens the swagger API generated docs in the default browser."
 	cmd.RunE = c.Run
 
-	// Hostname
+	// Hostname and Protocal
 	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
-
+	c.protocal = cmd.Flags().String("protocal", "http://", "The protocal to use when connecting to the server")
 	cmd.Args = cobra.ExactArgs(0)
 
 	return cmd
 }
 
 func (c *cmdDocs) Run(cmd *cobra.Command, args []string) error {
-	open("http://" + *c.host + "/swagger/index.html")
+	open(*c.protocal + *c.host + "/swagger/index.html")
 	return nil
 }
 

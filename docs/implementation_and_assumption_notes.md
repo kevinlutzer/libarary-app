@@ -12,8 +12,6 @@
 
 # Implementation Notes
 
-LXD uses what appears to be a distributed form of SQLite. I am going to use SQLite for this project as it is a lightweight database that is easy to use and setup. I am going to use [GORM](https://gorm.io/) as an object relational mapper to interact with the database. It doesn't appear that SQLite supports text arrays, so I am going to use a blob to store the list of books associated with a collection.
+I am going to use SQLite for this project as it is a lightweight database that is easy to use and setup. I am going to use [GORM](https://gorm.io/) as an object relational mapper to interact with the database. It doesn't appear that SQLite supports text arrays, so I am going to use a blob to store the list of books associated with a collection.
 
 Since I am assuming there can be multiple books with identical fields, I will use a UUID as the primary key. This does lessen the user experience when doing operations like delete and update as the user would have to know the UUID of the book they want to manipulate. However, I think that it does give more flexibility to the users as they can have multiple books with the same name, author, genre, edition, and description.
-
-I also choose to use the same HTTP routing multiplexer lxc/icarus uses, [gorilla/mux](github.com/gorilla/mux). The APIs use a CRUD REST style. 

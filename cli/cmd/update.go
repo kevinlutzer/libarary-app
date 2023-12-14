@@ -54,7 +54,8 @@ type cmdUpdateBook struct {
 	genre       *string
 	edition     *uint8
 
-	host *string
+	protocal *string
+	host     *string
 }
 
 func (c *cmdUpdateBook) Command() *cobra.Command {
@@ -72,9 +73,9 @@ func (c *cmdUpdateBook) Command() *cobra.Command {
 	c.genre = cmd.Flags().String("genre", "", "The genre of the book, valid genres are: "+shared.ValidGenreStr+"")
 	c.edition = cmd.Flags().Uint8("edition", 0, "The edition of the book")
 
-	// Hostname
+	// Hostname and Protocal
 	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
-
+	c.protocal = cmd.Flags().String("protocal", "http://", "The protocal to use when connecting to the server")
 	// Book specified [id]
 	cmd.Args = cobra.ExactArgs(1)
 
@@ -82,7 +83,7 @@ func (c *cmdUpdateBook) Command() *cobra.Command {
 }
 
 func (c *cmdUpdateBook) Run(cmd *cobra.Command, args []string) error {
-	url := "http://" + *c.host + "/v1/book"
+	url := *c.protocal + *c.host + "/v1/book"
 
 	data := &shared.BookData{}
 	fieldMask := []string{}
@@ -160,7 +161,8 @@ type cmdUpdateCollection struct {
 	name    *string
 	bookIDs *[]string
 
-	host *string
+	protocal *string
+	host     *string
 }
 
 func (c *cmdUpdateCollection) Command() *cobra.Command {
@@ -175,9 +177,9 @@ func (c *cmdUpdateCollection) Command() *cobra.Command {
 	c.name = cmd.Flags().String("name", "", "The name of the collection")
 	c.bookIDs = cmd.Flags().StringArray("bookid", []string{}, "The id of a book to add to the collection, this can be specified multiple times")
 
-	// Hostname
+	// Hostname and Protocal
 	c.host = cmd.Flags().String("host", "localhost:8080", "The hostname of the server to connect to, this must include the port")
-
+	c.protocal = cmd.Flags().String("protocal", "http://", "The protocal to use when connecting to the server")
 	// Book specified [id]
 	cmd.Args = cobra.ExactArgs(1)
 
@@ -185,7 +187,7 @@ func (c *cmdUpdateCollection) Command() *cobra.Command {
 }
 
 func (c *cmdUpdateCollection) Run(cmd *cobra.Command, args []string) error {
-	url := "http://" + *c.host + "/v1/book"
+	url := *c.protocal + *c.host + "/v1/book"
 
 	data := &shared.CollectionData{}
 	fieldMask := []string{}
